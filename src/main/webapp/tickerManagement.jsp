@@ -61,7 +61,7 @@
         <form action="MainController" method="get">
 
             <!-- action cho controller -->
-            <input type="hidden" name="action" value="ticker-list">
+            <input type="hidden" name="action" value="ticker-serach">
 
             <div class="row mb-4">
 
