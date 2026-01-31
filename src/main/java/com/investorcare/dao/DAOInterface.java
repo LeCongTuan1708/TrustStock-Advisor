@@ -4,6 +4,7 @@
  */
 package com.investorcare.dao;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 /**
@@ -12,18 +13,18 @@ import java.util.ArrayList;
  */
 public interface DAOInterface<T> {
     
-    public ArrayList<T> selectAll();
+    public ArrayList<T> selectAll() throws ClassNotFoundException, SQLException;
     
-    public T selectById(T t);
+    public T selectById(T t)  throws ClassNotFoundException, SQLException;
     
-    public int insert(T t);
+    public int insert(T t) throws ClassNotFoundException, SQLException;
     
-    public int insertAll(ArrayList<T> arr);
+    public int insertAll(ArrayList<T> arr) throws ClassNotFoundException, SQLException;
     
-    public int delete(T t);
+    public int delete(T t) throws ClassNotFoundException, SQLException;
     
-    public int deleteAll(ArrayList<T> arr);
+    public int deleteAll(ArrayList<T> arr) throws ClassNotFoundException, SQLException;
     
-    public int update(T t);
+    public int update(T t) throws ClassNotFoundException, SQLException;
     
 }
