@@ -25,7 +25,6 @@ public class AssetDAO implements DAOInterface<Asset> {
     private static final String INSERT = "INSERT INTO ASSET(TYPE,SYMBOL,EXCHANGE,NAME,STATUS) VALUES(?,?,?,?,?)";
     private static final String UPDATE = "UPDATE ASSET set TYPE = ?, SYMBOL = ?, EXCHANGE = ?, NAME = ?, STATUS =?";
 
-    @Override
     public ArrayList<Asset> selectAll() throws ClassNotFoundException, SQLException {
         ArrayList<Asset> kq = new ArrayList<>();
         Connection conn = null;
@@ -132,7 +131,6 @@ public class AssetDAO implements DAOInterface<Asset> {
         return kq;
     }
 
-    @Override
     public int insertAll(ArrayList<Asset> arr) throws ClassNotFoundException, SQLException  {
         int dem = 0;
         Connection conn = null;
@@ -170,17 +168,14 @@ public class AssetDAO implements DAOInterface<Asset> {
         return dem;
     }
 
-    @Override
     public int delete(Asset t) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
-    @Override
     public int deleteAll(ArrayList<Asset> arr) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
-    @Override
     public int update(Asset t) throws ClassNotFoundException, SQLException   {
         int kq = 0;
         Connection conn = null;
@@ -211,7 +206,6 @@ public class AssetDAO implements DAOInterface<Asset> {
         return kq;
     }
 
-    @Override
     public Asset selectById(Asset t) throws ClassNotFoundException, SQLException {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
