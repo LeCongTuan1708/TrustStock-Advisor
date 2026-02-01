@@ -20,10 +20,10 @@ import java.util.logging.Logger;
  */
 public class AssetDAO implements DAOInterface<Asset> {
 
-    private static final String SELECT_ALL = "SELECT * from ASSET";
-    private static final String SELECT = "SELECT * FROM ASSET WHERE SYMBOL LIKE ? OR NAME LIKE ?;";
+    private static final String SELECT_ALL = "SELECT * from ASSET WHERE 1=1";
+    private static final String SELECT = "SELECT * FROM ASSET WHERE (SYMBOL LIKE ? OR NAME LIKE ?)";
     private static final String INSERT = "INSERT INTO ASSET(TYPE,SYMBOL,EXCHANGE,NAME,STATUS) VALUES(?,?,?,?,?)";
-    private static final String UPDATE = "UPDATE ASSET set TYPE = ?, SYMBOL = ?, EXCHANGE = ?, NAME = ?, STATUS =?";
+    private static final String UPDATE = "UPDATE ASSET set TYPE = ?, SYMBOL = ?, EXCHANGE = ?, NAME = ?, STATUS =? WHERE ASSET_ID = ?";
 
     public ArrayList<Asset> selectAll() throws ClassNotFoundException, SQLException {
         ArrayList<Asset> kq = new ArrayList<>();
@@ -43,47 +43,9 @@ public class AssetDAO implements DAOInterface<Asset> {
                 String exchange = rs.getString("EXCHANGE");
                 String name = rs.getString("NAME");
                 String status = rs.getString("STATUS");
+                boolean visible = rs.getBoolean("VISIBLE");
 
-                Asset asset = new Asset(assetId, type, symbol, exchange, name, status);
-                kq.add(asset);
-            }
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(AssetDAO.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SQLException ex) {
-            Logger.getLogger(AssetDAO.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            if (pst != null) {
-                pst.close();
-            }
-            if (conn != null) {
-                conn.close();
-            }
-        }
-        return kq;
-    }
-
-    public ArrayList<Asset> selectById(String keyword) throws ClassNotFoundException, SQLException {
-        ArrayList<Asset> kq = new ArrayList<>();
-        Connection conn = null;
-        PreparedStatement pst = null;
-        try {
-            conn = JDBCUtils.getConnection();
-
-            pst = conn.prepareStatement(SELECT);
-            pst.setString(1, "%" + keyword + "%");
-            pst.setString(2, "%" + keyword + "%");
-
-            ResultSet rs = pst.executeQuery();
-
-            while (rs.next()) {
-                int assetId = rs.getInt("ASSET_ID");
-                String type = rs.getString("TYPE");
-                String symbol = rs.getString("SYMBOL");
-                String exchange = rs.getString("EXCHANGE");
-                String name = rs.getString("NAME");
-                String status = rs.getString("STATUS");
-
-                Asset asset = new Asset(assetId, type, symbol, exchange, name, status);
+                Asset asset = new Asset(assetId, type, symbol, exchange, name, status,visible);
                 kq.add(asset);
             }
         } catch (ClassNotFoundException ex) {
@@ -189,6 +151,8 @@ public class AssetDAO implements DAOInterface<Asset> {
             pst.setString(3, t.getExchange());
             pst.setString(4, t.getName());
             pst.setString(5, t.getStatus());
+            pst.setBoolean(6, t.isVisible());
+            pst.setInt(7, t.getAssetId());
             
             kq = pst.executeUpdate();
         } catch (ClassNotFoundException ex) {
@@ -208,6 +172,61 @@ public class AssetDAO implements DAOInterface<Asset> {
 
     public Asset selectById(Asset t) throws ClassNotFoundException, SQLException {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+    
+    public ArrayList<Asset> searchAssetByStatusAndVisible(String keyword, String s, String v) throws ClassNotFoundException, SQLException {
+        ArrayList<Asset> kq = new ArrayList<>();
+        Connection conn = null;
+        PreparedStatement pst = null;
+        try {
+            conn = JDBCUtils.getConnection();
+            StringBuilder sql = new StringBuilder(SELECT);
+            
+            if (s != null){
+                sql.append(" AND STATUS = ?");
+            }
+            if (v != null){
+                sql.append(" AND VISIBLE = ?");
+            }
+            pst = conn.prepareStatement(sql.toString());
+            int cnt = 1;
+            pst.setString(cnt++, "%" + keyword + "%");
+            pst.setString(cnt++, "%" + keyword + "%");
+            if (s != null){
+                pst.setString(cnt++, s);
+            }
+            if (v != null ){
+                boolean isVisible = v.equals("1"); 
+                pst.setBoolean(cnt++, isVisible);
+            }
+
+            ResultSet rs = pst.executeQuery();
+
+            while (rs.next()) {
+                int assetId = rs.getInt("ASSET_ID");
+                String type = rs.getString("TYPE");
+                String symbol = rs.getString("SYMBOL");
+                String exchange = rs.getString("EXCHANGE");
+                String name = rs.getString("NAME");
+                String status = rs.getString("STATUS");
+                boolean visible = rs.getBoolean("VISIBLE");
+
+                Asset asset = new Asset(assetId, type, symbol, exchange, name, status,visible);
+                kq.add(asset);
+            }
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(AssetDAO.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(AssetDAO.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            if (pst != null) {
+                pst.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
+        }
+        return kq;
     }
 
 }

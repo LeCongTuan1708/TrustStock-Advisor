@@ -11,17 +11,19 @@ package com.investorcare.model;
 public class Asset {
     private int assetId;
     private String type,symbol,exchange,name,status;
+    private boolean visible;
 
     public Asset() {
     }
 
-    public Asset(int assetId, String type, String symbol, String exchange, String name, String status) {
+    public Asset(int assetId, String type, String symbol, String exchange, String name, String status, boolean visible) {
         this.assetId = assetId;
         this.type = type;
         this.symbol = symbol;
         this.exchange = exchange;
         this.name = name;
         this.status = status;
+        this.visible = visible;
     }
 
     public int getAssetId() {
@@ -70,6 +72,14 @@ public class Asset {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public boolean isVisible() {
+        return visible;
+    }
+
+    public void setVisible(boolean visible) {
+        this.visible = visible;
     }
     
 }
