@@ -4,6 +4,7 @@
     Author     : DELL
 --%>
 
+<%@page import="java.sql.Timestamp"%>
 <%@page import="com.investorcare.model.Asset"%>
 <%@page import="java.util.ArrayList"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
@@ -81,7 +82,7 @@
                     </div>
 
                     <div class="col-md-6 d-flex justify-content-end align-items-start">
-                        <a href="MainController?action=add-ticker-form" class="btn btn-dark">
+                        <a href="MainController?action=add-asset" class="btn btn-dark">
                             Add New Ticker
                         </a>
                     </div>
@@ -126,6 +127,9 @@
                                 <tr>
                                     <th class="ps-3">Ticker</th>
                                     <th>Company Name</th>
+                                    <th>Exchange</th>
+                                    <th>Data Status</th>
+                                    <th>Last Update</th>
                                     <th>Status</th>
                                     <th>Visible</th>
                                     <th>Action</th>
@@ -137,18 +141,49 @@
                                 <%
                                     ArrayList<Asset> list = (request.getAttribute("list") != null) ? (ArrayList<Asset>) request.getAttribute("list") : new ArrayList<Asset>();
                                     for (Asset asset : list) {
-                                            String symbol = asset.getSymbol();
-                                            String name = asset.getName();
-                                            String status = asset.getStatus();
-                                            String visible = asset.isVisible() == true ? "Visible":"Hidden";
+                                        String symbol = asset.getSymbol();
+                                        String name = asset.getName();
+                                        String status = asset.getStatus();
+                                        String visible = asset.isVisible() == true ? "Visible" : "Hidden";
+                                        String exchange = asset.getExchange();
+                                        Timestamp last_update = asset.getUpdatedAt();
                                 %>
                                 <tr>
                                     <td class="ps-3"><%= symbol%></td>
                                     <td><%= name%></td>
+                                    <td><%= exchange%></td>
+                                    <td>
+                                        <%
+                                            Timestamp updated = asset.getUpdatedAt();
+                                            if (updated == null) {
+                                        %>
+                                        <span class="badge bg-secondary">Not Initialized</span>
+                                        <%
+                                        } else {
+                                            long diff = System.currentTimeMillis() - updated.getTime();
+                                            long days = diff / (1000 * 60 * 60 * 24);
+
+                                            if (days <= 1) {
+                                        %>
+                                        <span class="badge bg-success">Healthy</span>
+                                        <%
+                                        } else if (days <= 3) {
+                                        %>
+                                        <span class="badge bg-warning text-dark">Stale</span>
+                                        <%
+                                        } else {
+                                        %>
+                                        <span class="badge bg-danger">Outdated</span>
+                                        <%
+                                                }
+                                            }
+                                        %>
+                                    </td>
+                                    <td><%= last_update%></td>
                                     <td><span class="badge bg-info text-dark"><%= status%></span></td>
                                     <td><span class="badge bg-success"><%= visible%></span></td>
                                     <td>
-                                        <a href="#" class="btn btn-sm btn-outline-secondary">Edit</a>
+                                        <a href="MainController?action=edit-asset&assetId=<%= asset.getAssetId() %>" class="btn btn-sm btn-outline-secondary">Edit</a>
                                     </td>
                                 </tr>
                                 <%}%>

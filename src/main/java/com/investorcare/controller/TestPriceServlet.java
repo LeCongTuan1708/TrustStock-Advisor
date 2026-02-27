@@ -4,8 +4,10 @@
  */
 package com.investorcare.controller;
 
+import com.mycompany.investorcare.StockService;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -16,8 +18,8 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author DELL
  */
-@WebServlet(name = "MainController", urlPatterns = {"/MainController"})
-public class MainController extends HttpServlet {
+@WebServlet(name = "TestPriceServlet", urlPatterns = {"/test-price"})
+public class TestPriceServlet extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -28,48 +30,34 @@ public class MainController extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
-    private static final String ERROR = "error.jsp";
-
-    private static final String LOGIN = "login";
-    private static final String LOGIN_CONTROLLER = "loginController";
-
-    private static final String SEARCH_ASSET = "asset-search";
-    private static final String SEARCH_ASSET_Controller = "AssetListController";
-
-    private static final String ADD_ASSET = "add-asset";
-    private static final String ADD_ASSET_Controller = "addAssetController";
-    
-    private static final String EDIT_ASSET = "edit-asset";
-    private static final String EDIT_ASSET_Controller = "editAssetController";
-
-
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        String url = ERROR;
-        try {
-            String action = request.getParameter("action");
-            if (LOGIN.equals(action)) {
-                url = LOGIN_CONTROLLER;
-            } else if (SEARCH_ASSET.equals(action)) {
-                url = SEARCH_ASSET_Controller;
-            } else if (ADD_ASSET.equals(action)) {
-                url = ADD_ASSET_Controller;
-            
-            } else if (EDIT_ASSET.equals(action)) {
-                url = EDIT_ASSET_Controller;
-            
-            } else {
-                request.setAttribute("ERROR", "Your action not support");
-            }
-        } catch (Exception e) {
-            log("Error at MainController: " + e.toString());
-        } finally {
-            request.getRequestDispatcher(url).forward(request, response);
-        }
-    }
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
+        PrintWriter out = response.getWriter();
 
+    StockService service = new StockService();
+    
+    out.println("<h2>Đang tiến hành cập nhật dữ liệu...</h2>");
+    out.println("<p>Vui lòng kiên nhẫn đợi, không tắt trình duyệt.</p>");
+    out.println("<ul>");
+    
+    // Lấy danh sách để hiển thị cho người dùng biết sẽ update cái gì
+    List<String> symbols = service.getAllActiveSymbols();
+    for(String sym : symbols) {
+        out.println("<li>Đã tìm thấy mã: " + sym + "</li>");
+    }
+    out.println("</ul>");
+    
+    // Gọi hàm chạy chậm (Batch Update)
+    // Lưu ý: Việc gọi hàm này sẽ làm treo trình duyệt cho đến khi chạy xong
+    // Trong thực tế người ta dùng Thread riêng, nhưng để test thì gọi trực tiếp cũng được.
+    service.runBatchUpdate();
+
+    out.println("<h3>✅ CẬP NHẬT HOÀN TẤT! Kiểm tra Database ngay.</h3>");
+
+    }
+
+    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
      *
