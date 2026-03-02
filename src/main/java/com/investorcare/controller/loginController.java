@@ -22,7 +22,7 @@ import javax.servlet.http.HttpSession;
 public class loginController extends HttpServlet {
 
     private final static String USER_MANAGEMENT = "userManagement.jsp";
-    private final static String TICKER_MANAGEMENT = "tickerManagement.jsp";
+    private final static String TICKER_MANAGEMENT = "assetManagement.jsp";
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");

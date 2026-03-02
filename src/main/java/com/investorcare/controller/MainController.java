@@ -27,7 +27,22 @@ public class MainController extends HttpServlet {
     private static final String SIGNUP_CONTROLLER = "SignupController";
     private static final String USER_LIST = "user-list";
     private static final String USER_MANAGEMENT = "UserManagementController";
+
+
+    private static final String SEARCH_ASSET = "asset-search";
+    private static final String SEARCH_ASSET_Controller = "AssetListController";
+
+    private static final String ADD_ASSET = "add-asset";
+    private static final String ADD_ASSET_Controller = "addAssetController";
     
+    private static final String EDIT_ASSET = "edit-asset";
+    private static final String EDIT_ASSET_controller = "editAssetController";
+    private static final String EDIT_USER = "edit-user";
+    private static final String UPDATE_USER = "update-user";
+    private static final String EDIT_USER_CONTROLLER = "EditUserController";
+    
+    
+
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -37,12 +52,20 @@ public class MainController extends HttpServlet {
             String action = request.getParameter("action");
             if (LOGIN.equals(action)) {
                 url = LOGIN_CONTROLLER;
+            } else if (SEARCH_ASSET.equals(action)) {
+                url = SEARCH_ASSET_Controller;
+            } else if (ADD_ASSET.equals(action)) {
+                url = ADD_ASSET_Controller;
+            } else if (EDIT_ASSET.equals(action)) {
+                url = EDIT_ASSET_controller;
             }
             else if(SIGNUP.equals(action)){
                 url = SIGNUP_CONTROLLER;
             }
             else if(USER_LIST.equals(action)){
                 url = USER_MANAGEMENT;
+            }else if(EDIT_USER.equals(action) || UPDATE_USER.equals(action)){
+                url = EDIT_USER_CONTROLLER;
             }
             else{
                 request.setAttribute("ERROR", "Your action not support");
