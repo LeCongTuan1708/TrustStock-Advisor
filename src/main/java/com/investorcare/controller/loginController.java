@@ -41,7 +41,7 @@ public class loginController extends HttpServlet {
                 if("Admin".equalsIgnoreCase(loginUser.getRole())){
                     response.sendRedirect(USER_MANAGEMENT);
                 }else{
-                    response.sendRedirect(TICKER_MANAGEMENT); 
+                    response.sendRedirect(USER_MANAGEMENT); 
                 }
                 return;
             }else{

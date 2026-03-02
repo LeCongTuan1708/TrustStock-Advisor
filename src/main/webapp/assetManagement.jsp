@@ -21,7 +21,7 @@
                         <h4 class="text-info fw-bold mb-4 d-flex align-items-center">
                             <i class="bi bi-graph-up me-2"></i> 
                             <div>
-                                Invenstor Care
+                                Investor Care
                                 <span class="fs-6 text-secondary fw-normal d-block">Admin Panel</span>
                             </div>
                         </h4>
