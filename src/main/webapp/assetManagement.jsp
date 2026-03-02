@@ -1,7 +1,6 @@
 <%@page import="java.sql.Timestamp"%>
 <%@page import="com.investorcare.model.Asset"%>
 <%@page import="java.util.ArrayList"%>
-<<<<<<< HEAD
 <%@page import="java.time.LocalDateTime"%>
 <%@page import="java.time.ZoneId"%>
 <%@page import="java.time.format.DateTimeFormatter"%>
