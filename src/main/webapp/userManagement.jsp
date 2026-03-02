@@ -61,7 +61,7 @@
         <div class="container mt-4">
 
             <!-- SEARCH + FILTER FORM -->
-            <form action="MainController" method="get">
+            <form action="MainController" method="POST">
 
                 <!-- action cho controller -->
                 <input type="hidden" name="action" value="user-list">
