@@ -35,7 +35,7 @@
                                 <a href="#" class="nav-link active px-3">User</a>
                             </li>
                             <li class="nav-item">
-                                <a href="#" class="nav-link px-3">Tickers</a>
+                                <a href="MainController?action=asset-search" class="nav-link px-3">Asset</a>
                             </li>
                             <li class="nav-item">
                                 <a href="#" class="nav-link px-3">Alert</a>

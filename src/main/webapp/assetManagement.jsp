@@ -35,7 +35,7 @@
                                 <a href="#" class="nav-link px-3">User</a>
                             </li>
                             <li class="nav-item">
-                                <a href="#" class="nav-link active px-3">Tickers</a>
+                                <a href="" class="nav-link px-3">Assets</a>
                             </li>
                             <li class="nav-item">
                                 <a href="#" class="nav-link px-3">Alert</a>
@@ -63,7 +63,7 @@
                 String oldStatus = (request.getAttribute("oldStatus") != null) ? (String) request.getAttribute("oldStatus") : "";
                 String oldVisible = (request.getAttribute("oldVisible") != null) ? (String) request.getAttribute("oldVisible") : "";
             %>
-            <form action="MainController" method="get">
+            <form action="MainController" method="post">
 
                 <input type ="hidden" name="action" value="asset-search">
 
@@ -82,7 +82,7 @@
                     </div>
 
                     <div class="col-md-6 d-flex justify-content-end align-items-start">
-                        <a href="MainController?action=add-asset" class="btn btn-dark">
+                        <a href="MainController?action=add-asset-button" class="btn btn-dark">
                             Add New Ticker
                         </a>
                     </div>
@@ -154,13 +154,15 @@
                                     <td><%= exchange%></td>
                                     <td>
                                         <%
-                                            Timestamp updated = asset.getUpdatedAt();
+                                            Timestamp updated = asset.getUpdatedAt();//lấy thời gian hiện tại
                                             if (updated == null) {
                                         %>
                                         <span class="badge bg-secondary">Not Initialized</span>
                                         <%
                                         } else {
+                                            //lấy khoảnh cách thời gian chênh lệch
                                             long diff = System.currentTimeMillis() - updated.getTime();
+                                            //đổi miligiay sang số ngày
                                             long days = diff / (1000 * 60 * 60 * 24);
 
                                             if (days <= 1) {
