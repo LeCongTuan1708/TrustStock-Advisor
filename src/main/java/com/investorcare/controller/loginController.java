@@ -22,7 +22,7 @@ import javax.servlet.http.HttpSession;
 public class loginController extends HttpServlet {
 
     private final static String USER_MANAGEMENT = "userManagement.jsp";
-    private final static String TICKER_MANAGEMENT = "tickerManagement.jsp";
+    private final static String USER_DASHBOARD = "userDashboard.jsp";
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
@@ -40,8 +40,9 @@ public class loginController extends HttpServlet {
                 session.setAttribute("ROLE", loginUser.getRole());
                 if("Admin".equalsIgnoreCase(loginUser.getRole())){
                     url = USER_MANAGEMENT;
-                }else{
-                    url = TICKER_MANAGEMENT;
+                }else if ("User".equalsIgnoreCase(loginUser.getRole()))
+                {
+                    url = USER_DASHBOARD;
                 }
             }else{
                 request.setAttribute("ERROR", "Incorrect Username or Password!");

@@ -37,9 +37,9 @@
         <div class="sidebar-label">Menu</div>
         <a href="#account" class="active"><span>👤</span> Account</a>
         <a href="#portfolio"><span>💼</span> Portfolio</a>
-        <a href="#watchlist"><span>👁️</span> WatchList</a>
+        <a href="MainController?action=watch-list"><span>👁️</span> WatchList</a>
         <a href="#alerts"><span>🔔</span> Alerts</a>
-        <a href="#carenote"><span>📝</span> Care Note</a>
+        <a href="MainController?action=care-note-list"><span>📝</span> Care Note</a>
     </div>
 
     <!-- CONTENT -->

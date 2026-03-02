@@ -1,9 +1,113 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
-	 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	 xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
-	 version="3.1">
+<web-app version="3.1" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd">
+    <servlet>
+        <servlet-name>EditWatchListController</servlet-name>
+        <servlet-class>com.investorcare.controller.EditWatchListController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>AddWatchListController</servlet-name>
+        <servlet-class>com.investorcare.controller.AddWatchListController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>WatchListItemController</servlet-name>
+        <servlet-class>com.investorcare.controller.WatchListItemController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ShowAddWatchListItemController</servlet-name>
+        <servlet-class>com.investorcare.controller.ShowAddWatchListItemController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>AddWatchListItemController</servlet-name>
+        <servlet-class>com.investorcare.controller.AddWatchListItemController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>RemoveWatchListItemController</servlet-name>
+        <servlet-class>com.investorcare.controller.RemoveWatchListItemController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>RemoveWatchListController</servlet-name>
+        <servlet-class>com.investorcare.controller.RemoveWatchListController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>CareNoteListController</servlet-name>
+        <servlet-class>com.investorcare.controller.CareNoteListController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ShowAddCareNoteController</servlet-name>
+        <servlet-class>com.investorcare.controller.ShowAddCareNoteController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>AddCareNoteController</servlet-name>
+        <servlet-class>com.investorcare.controller.AddCareNoteController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ShowEditCareNoteController</servlet-name>
+        <servlet-class>com.investorcare.controller.ShowEditCareNoteController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>EditCareNoteController</servlet-name>
+        <servlet-class>com.investorcare.controller.EditCareNoteController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>RemoveCareNoteController</servlet-name>
+        <servlet-class>com.investorcare.controller.RemoveCareNoteController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>WatchListController</servlet-name>
+        <url-pattern>/WatchListController</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>EditWatchListController</servlet-name>
+        <url-pattern>/EditWatchListController</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AddWatchListController</servlet-name>
+        <url-pattern>/AddWatchListController</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>WatchListItemController</servlet-name>
+        <url-pattern>/WatchListItemController</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ShowAddWatchListItemController</servlet-name>
+        <url-pattern>/ShowAddWatchListItemController</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AddWatchListItemController</servlet-name>
+        <url-pattern>/AddWatchListItemController</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>RemoveWatchListItemController</servlet-name>
+        <url-pattern>/RemoveWatchListItemController</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>RemoveWatchListController</servlet-name>
+        <url-pattern>/RemoveWatchListController</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>CareNoteListController</servlet-name>
+        <url-pattern>/CareNoteListController</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ShowAddCareNoteController</servlet-name>
+        <url-pattern>/ShowAddCareNoteController</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AddCareNoteController</servlet-name>
+        <url-pattern>/AddCareNoteController</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ShowEditCareNoteController</servlet-name>
+        <url-pattern>/ShowEditCareNoteController</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>EditCareNoteController</servlet-name>
+        <url-pattern>/EditCareNoteController</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>RemoveCareNoteController</servlet-name>
+        <url-pattern>/RemoveCareNoteController</url-pattern>
+    </servlet-mapping>
     <session-config>
         <session-timeout>
             30
@@ -13,13 +117,15 @@
         <welcome-file>login.jsp</welcome-file>
     </welcome-file-list>
     <servlet>
-    <servlet-name>TestPriceServlet</servlet-name>
-    <servlet-class>com.investorcare.controller.TestPriceServlet</servlet-class>
-</servlet>
-
-<servlet-mapping>
-    <servlet-name>TestPriceServlet</servlet-name>
-    <url-pattern>/test-price</url-pattern>
-</servlet-mapping>
-
+        <servlet-name>TestPriceServlet</servlet-name>
+        <servlet-class>com.investorcare.controller.TestPriceServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>WatchListController</servlet-name>
+        <servlet-class>com.investorcare.controller.WatchListController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>TestPriceServlet</servlet-name>
+        <url-pattern>/test-price</url-pattern>
+    </servlet-mapping>
 </web-app>
