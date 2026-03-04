@@ -27,7 +27,7 @@
         <div class="container">
             <div class="row d-flex justify-content-center align-items-center vh-100">
                 <div class="col-md-4">
-                    <form action="MainController" class="card shadow p-4 bg-white">
+                    <form action="MainController" class="card shadow p-4 bg-white" method="POST">
                         <input type="hidden" name="action" value="login">
                         <label for="" class="form-check-label text-center fs-3"><b>Sign in</b></label>
                         <div style="color: red"><%=error%></div>
@@ -40,7 +40,7 @@
                         <input type="password" name="password" value="<%=request.getParameter("password")!= null ? request.getParameter("password") : ""%>"
                                class=" form-control p-2" placeholder="Enter password...">
                         
-                        <button class="btn btn-dark mt-3" type="submit" name="action" value="login">Sign in
+                        <button class="btn btn-dark mt-3" type="submit"  value="login">Sign in
                         </button>
                         <p class="text-center pt-3 m-0 text-black">Chưa có tài khoản?  <a href="signup.jsp" style=" color: black">Đăng ký</a></p>
                     </form>

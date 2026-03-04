@@ -4,26 +4,19 @@
  */
 package com.investorcare.controller;
 
-import com.investorcare.dao.AssetDAO;
-import com.investorcare.model.Asset;
+import com.investorcare.model.WatchListItem;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
  *
- * @author DELL
+ * @author quyt2
  */
-@WebServlet(name = "addAssetController", urlPatterns = {"/addAssetController"})
-public class addAssetController extends HttpServlet {
+public class AddWatchListItemController extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -37,43 +30,38 @@ public class addAssetController extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        AssetDAO dao = new AssetDAO();
-        
-        String symbol = request.getParameter("symbol");
-        String name = request.getParameter("name");
-        String type = request.getParameter("type");
-        String exchange = request.getParameter("exchange");
-        String status = "Active";
-        
+
+        String watchListIdStr = request.getParameter("watchListId");
+        // Xui rủi mà lỗi thì đá về danh sách thư mục gốc
+        String url = "MainController?action=watch-list";
+
         try {
-            int checkName = dao.selectByName(name);
-            if( checkName !=0 ){
-            request.setAttribute("ERROR", "Lỗi: sản phẩm " + name + " đã tồn tại!");
-            request.getRequestDispatcher("error.jsp").forward(request, response);
-            return;
+            String assetIdStr = request.getParameter("assetId");
+
+            if (watchListIdStr != null && assetIdStr != null) {
+                int watchListId = Integer.parseInt(watchListIdStr);
+                int assetId = Integer.parseInt(assetIdStr);
+
+
+                WatchListItem item = new WatchListItem();
+                item.setWatchListId(watchListId);
+                item.setAssetId(assetId);
+
+                // Gọi DAO Insert
+                com.investorcare.dao.WatchListItemDAO dao = new com.investorcare.dao.WatchListItemDAO();
+                boolean check = dao.insert(item);
+
+                if (check) {
+                    // Thành công thì dùng Redirect đá về trang Chi Tiết Thư Mục cũ để nó load lại data
+                    url = "MainController?action=watchlist-item&selectedId=" + watchListId;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(addAssetController.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SQLException ex) {
-            Logger.getLogger(addAssetController.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-        
-        
-        
-        //Lấy thời gian thực lúc tạo mới 
-        Timestamp now = new Timestamp(System.currentTimeMillis());
-        
-        Asset asset = new Asset(type, symbol, exchange, name, status , true, now, now);
-        try {
-            dao.insert(asset);
-            response.sendRedirect("MainController?action=asset-search");
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(addAssetController.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SQLException ex) {
-            Logger.getLogger(addAssetController.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
+
+        // Bẻ lái (PRG Pattern chống F5 nè)
+        response.sendRedirect(url);
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

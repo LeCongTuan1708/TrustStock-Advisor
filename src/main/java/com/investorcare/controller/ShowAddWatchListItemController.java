@@ -8,22 +8,17 @@ import com.investorcare.dao.AssetDAO;
 import com.investorcare.model.Asset;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.List;
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
  *
- * @author DELL
+ * @author quyt2
  */
-@WebServlet(name = "addAssetController", urlPatterns = {"/addAssetController"})
-public class addAssetController extends HttpServlet {
+public class ShowAddWatchListItemController extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -37,43 +32,20 @@ public class addAssetController extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        AssetDAO dao = new AssetDAO();
-        
-        String symbol = request.getParameter("symbol");
-        String name = request.getParameter("name");
-        String type = request.getParameter("type");
-        String exchange = request.getParameter("exchange");
-        String status = "Active";
-        
         try {
-            int checkName = dao.selectByName(name);
-            if( checkName !=0 ){
-            request.setAttribute("ERROR", "Lỗi: sản phẩm " + name + " đã tồn tại!");
-            request.getRequestDispatcher("error.jsp").forward(request, response);
-            return;
+            String watchListId = request.getParameter("watchListId");
+            request.setAttribute("CURRENT_WATCHLIST_ID", watchListId);
+
+            AssetDAO assetDao = new AssetDAO();
+            List<Asset> listAsset = assetDao.selectAll();
+
+            request.setAttribute("LIST_ASSET", listAsset);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            request.getRequestDispatcher("addWatchListItem.jsp").forward(request, response);
         }
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(addAssetController.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SQLException ex) {
-            Logger.getLogger(addAssetController.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-        
-        
-        
-        //Lấy thời gian thực lúc tạo mới 
-        Timestamp now = new Timestamp(System.currentTimeMillis());
-        
-        Asset asset = new Asset(type, symbol, exchange, name, status , true, now, now);
-        try {
-            dao.insert(asset);
-            response.sendRedirect("MainController?action=asset-search");
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(addAssetController.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SQLException ex) {
-            Logger.getLogger(addAssetController.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
