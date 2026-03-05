@@ -2,25 +2,34 @@
 <%@page import="com.investorcare.model.PortfolioHolding"%>
 <%@page import="com.investorcare.model.Portfolio"%>
 <%@page import="com.investorcare.model.User"%>
-<%@page import="java.util.*"%>
+<%@page import="com.investorcare.model.Alert"%>
 <%@page import="com.investorcare.model.Asset"%>
+<%@page import="java.util.*"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%
+    User acc = (User) session.getAttribute("LOGIN_USER");
+    if (acc == null) { response.sendRedirect("login.jsp"); return; }
+
+    List<Portfolio>          portfolios     = (List<Portfolio>)          request.getAttribute("portfolios");
+    List<Asset>              assets         = (List<Asset>)              request.getAttribute("assets");
+    Map<Integer,AssetQuote>  quotes         = (Map<Integer,AssetQuote>)  request.getAttribute("quotes");
+    List<Alert>              alerts         = (List<Alert>)              request.getAttribute("alerts");
+    List<PortfolioHolding>   holdings       = (List<PortfolioHolding>)   request.getAttribute("holdings");
+    Integer                  openPortfolioId= (Integer)                  request.getAttribute("openPortfolioId");
+    Integer                  unreadCount    = (Integer)                  request.getAttribute("unreadCount");
+    if (unreadCount == null) unreadCount = 0;
+%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TrustStock — Dashboard</title>
     <link rel="stylesheet" href="style_dashboard.css">
 </head>
 <body>
-<%
-    User acc = (User) session.getAttribute("LOGIN_USER");
-    if (acc == null) { response.sendRedirect("login.jsp"); return; }
-    List<Portfolio> portfolios = (List<Portfolio>) request.getAttribute("portfolios");
-%>
 
-<!-- NAVBAR -->
+<!-- ===== NAVBAR ===== -->
 <nav class="navbar">
     <div class="navbar-brand">
         <div class="navbar-brand-icon">📈</div>
@@ -28,21 +37,25 @@
     </div>
     <div class="navbar-right">
         <span class="navbar-greeting">Welcome, <strong><%= acc.getUsername()%></strong></span>
-        <div class="navbar-avatar"><%= acc.getUsername().substring(0, 1).toUpperCase()%></div>
+        <div class="navbar-avatar"><%= acc.getUsername().substring(0,1).toUpperCase()%></div>
         <a href="MainController?action=logout" class="navbar-logout">Logout</a>
     </div>
 </nav>
 
-<!-- NAV TABS -->
+<!-- ===== NAV TABS ===== -->
 <div class="nav-tabs">
     <a href="#account"   class="tab-link active"><span class="icon">👤</span> Account</a>
     <a href="#market"    class="tab-link"><span class="icon">📊</span> Market</a>
     <a href="#portfolio" class="tab-link"><span class="icon">💼</span> Portfolio</a>
     <a href="#watchlist" class="tab-link"><span class="icon">👁️</span> WatchList</a>
-    <a href="#alerts"    class="tab-link"><span class="icon">🔔</span> Alerts</a>
+    <a href="#alerts"    class="tab-link">
+        <span class="icon">🔔</span> Alerts
+        <% if (unreadCount > 0) { %><span class="badge-count"><%= unreadCount %> new</span><% } %>
+    </a>
     <a href="#carenote"  class="tab-link"><span class="icon">📝</span> Care Note</a>
 </div>
 
+<!-- ===== CONTENT ===== -->
 <div class="content">
 
     <!-- ACCOUNT -->
@@ -54,7 +67,7 @@
             </form>
         </div>
         <div class="account-info">
-            <div class="account-avatar"><%= acc.getUsername().substring(0, 1).toUpperCase()%></div>
+            <div class="account-avatar"><%= acc.getUsername().substring(0,1).toUpperCase()%></div>
             <div>
                 <div class="account-name"><%= acc.getUsername()%></div>
                 <div style="margin-top:6px;"><span class="badge badge-green">● Active</span></div>
@@ -66,11 +79,7 @@
         </div>
     </section>
 
-    <!-- MARKET ASSETS -->
-    <%
-        List<Asset> assets = (List<Asset>) request.getAttribute("assets");
-        Map<Integer, AssetQuote> quotes = (Map<Integer, AssetQuote>) request.getAttribute("quotes");
-    %>
+    <!-- MARKET -->
     <section id="market" class="section-card">
         <div class="section-header">
             <div class="section-title"><span class="icon">📊</span> Market Assets</div>
@@ -79,15 +88,13 @@
             <table class="data-table">
                 <thead>
                     <tr>
-                        <th>Symbol</th>
-                        <th>Name</th>
-                        <th>Exchange</th>
+                        <th>Symbol</th><th>Name</th><th>Exchange</th>
                         <th class="right">Price</th>
                         <th class="right">Change</th>
                         <th class="right">Change %</th>
                         <th class="right">Open</th>
-                        <th class="right">Day High</th>
-                        <th class="right">Day Low</th>
+                        <th class="right">High</th>
+                        <th class="right">Low</th>
                         <th class="right">Prev Close</th>
                         <th class="center">Actions</th>
                     </tr>
@@ -97,79 +104,46 @@
                     if (assets != null) {
                         for (Asset a : assets) {
                             AssetQuote q = quotes != null ? quotes.get(a.getAssetId()) : null;
-                            boolean up = q != null && q.isUp();
-                            String changeClass = up ? "text-green" : "text-red";
+                            boolean up   = q != null && q.getChange() >= 0;
+                            String cls   = up ? "text-green" : "text-red";
                             String arrow = up ? "▲" : "▼";
                 %>
                 <tr>
                     <td class="bold"><span class="ticker-tag"><%= a.getSymbol()%></span></td>
                     <td class="muted"><%= a.getName()%></td>
                     <td><span class="exchange-tag"><%= a.getExchange()%></span></td>
-
-                    <!-- Price -->
                     <td class="right">
-                        <span class="price-cell">
-                            <%= q != null && q.getCurrentPrice() > 0
-                                ? String.format("$%.2f", q.getCurrentPrice()) : "N/A"%>
-                        </span>
+                        <span class="price-cell"><%= q != null && q.getCurrentPrice() > 0 ? String.format("$%.2f", q.getCurrentPrice()) : "N/A"%></span>
                     </td>
-
-                    <!-- Change $ -->
                     <td class="right">
                         <% if (q != null && q.getCurrentPrice() > 0) { %>
-                        <span class="<%= changeClass%>">
-                            <%= arrow%> <%= String.format("$%.2f", Math.abs(q.getChange()))%>
-                        </span>
-                        <% } else { %><span class="muted">—</span><% } %>
+                            <span class="<%= cls%>"><%= arrow%> $<%= String.format("%.2f", Math.abs(q.getChange()))%></span>
+                        <% } else { %>—<% } %>
                     </td>
-
-                    <!-- Change % -->
                     <td class="right">
                         <% if (q != null && q.getCurrentPrice() > 0) { %>
-                        <span class="change-badge <%= up ? "badge-up" : "badge-down"%>">
-                            <%= arrow%> <%= String.format("%.2f", Math.abs(q.getChangePercent()))%>%
-                        </span>
-                        <% } else { %><span class="muted">—</span><% } %>
+                            <span class="change-badge <%= up ? "badge-up" : "badge-down"%>">
+                                <%= arrow%> <%= String.format("%.2f", Math.abs(q.getChangePercent()))%>%
+                            </span>
+                        <% } else { %>—<% } %>
                     </td>
-
-                    <!-- Open -->
-                    <td class="right mono">
-                        <%= q != null && q.getOpen() > 0
-                            ? String.format("$%.2f", q.getOpen()) : "—"%>
-                    </td>
-
-                    <!-- Day High -->
-                    <td class="right mono text-green">
-                        <%= q != null && q.getDayHigh() > 0
-                            ? String.format("$%.2f", q.getDayHigh()) : "—"%>
-                    </td>
-
-                    <!-- Day Low -->
-                    <td class="right mono text-red">
-                        <%= q != null && q.getDayLow() > 0
-                            ? String.format("$%.2f", q.getDayLow()) : "—"%>
-                    </td>
-
-                    <!-- Prev Close -->
-                    <td class="right mono muted">
-                        <%= q != null && q.getPrevClose() > 0
-                            ? String.format("$%.2f", q.getPrevClose()) : "—"%>
-                    </td>
-
-                    <!-- Actions -->
+                    <td class="right mono"><%= q != null && q.getOpen()      > 0 ? String.format("$%.2f", q.getOpen())      : "—"%></td>
+                    <td class="right mono text-green"><%= q != null && q.getDayHigh()   > 0 ? String.format("$%.2f", q.getDayHigh())   : "—"%></td>
+                    <td class="right mono text-red">  <%= q != null && q.getDayLow()    > 0 ? String.format("$%.2f", q.getDayLow())    : "—"%></td>
+                    <td class="right mono muted">     <%= q != null && q.getPrevClose() > 0 ? String.format("$%.2f", q.getPrevClose()) : "—"%></td>
                     <td class="center">
                         <div class="td-actions">
                             <form action="PortfolioController" method="post">
                                 <input type="hidden" name="portfolioAction" value="addAsset">
                                 <input type="hidden" name="assetId" value="<%= a.getAssetId()%>">
                                 <select name="portfolioId" class="input-dark" required>
-                                    <option value="">-- Select portfolio --</option>
+                                    <option value="">-- Select --</option>
                                     <% if (portfolios != null) { for (Portfolio pOpt : portfolios) { %>
                                     <option value="<%= pOpt.getPortfolioId()%>"><%= pOpt.getName()%></option>
                                     <% } } %>
                                 </select>
-                                <input type="number" name="qty" step="0.0001" placeholder="Qty" class="input-dark sm" required>
-                                <input type="number" name="avgCost" step="0.01" placeholder="Avg Cost" class="input-dark sm" required>
+                                <input type="number" name="qty"     step="0.0001" placeholder="Qty"  class="input-dark sm" required>
+                                <input type="number" name="avgCost" step="0.01"   placeholder="Cost" class="input-dark sm" required>
                                 <button type="submit" class="btn btn-dark btn-sm">+ Add</button>
                             </form>
                         </div>
@@ -193,22 +167,20 @@
             </form>
         </div>
         <div class="portfolio-list">
-        <%
-            if (portfolios != null && !portfolios.isEmpty()) {
-                for (Portfolio p : portfolios) {
-        %>
-        <div class="portfolio-card">
+        <% if (portfolios != null && !portfolios.isEmpty()) {
+               for (Portfolio p : portfolios) { %>
+        <div class="portfolio-card" id="portfolio-card-<%= p.getPortfolioId()%>">
             <input type="checkbox" id="rename-toggle-<%= p.getPortfolioId()%>" class="rename-toggle">
             <div class="portfolio-main">
                 <div class="portfolio-name">💼 <%= p.getName()%></div>
                 <div class="portfolio-actions">
-                    <form action="PortfolioController" method="post">
+                    <form action="PortfolioController" method="post" style="display:inline">
                         <input type="hidden" name="portfolioAction" value="open">
                         <input type="hidden" name="portfolioId" value="<%= p.getPortfolioId()%>">
                         <button type="submit" class="btn btn-light btn-sm">📂 Open</button>
                     </form>
                     <label for="rename-toggle-<%= p.getPortfolioId()%>" class="btn btn-light btn-sm">✏️ Rename</label>
-                    <form action="PortfolioController" method="post"
+                    <form action="PortfolioController" method="post" style="display:inline"
                           onsubmit="return confirm('Delete portfolio <%= p.getName()%>?')">
                         <input type="hidden" name="portfolioAction" value="delete">
                         <input type="hidden" name="portfolioId" value="<%= p.getPortfolioId()%>">
@@ -224,10 +196,7 @@
                 <label for="rename-toggle-<%= p.getPortfolioId()%>" class="btn btn-outline btn-sm">Cancel</label>
             </form>
         </div>
-        <%
-            }
-        } else {
-        %>
+        <% } } else { %>
         <p style="color:var(--text-muted);font-size:13px;text-align:center;padding:24px 0;">
             No portfolios yet. Create one to get started!
         </p>
@@ -236,11 +205,7 @@
     </section>
 
     <!-- HOLDINGS PANEL -->
-    <%
-        List<PortfolioHolding> holdings = (List<PortfolioHolding>) request.getAttribute("holdings");
-        Integer openPortfolioId = (Integer) request.getAttribute("openPortfolioId");
-        if (holdings != null && openPortfolioId != null) {
-    %>
+    <% if (holdings != null && openPortfolioId != null) { %>
     <div class="holdings-panel section-card">
         <div class="holdings-header">
             <span>📋 Portfolio Details</span>
@@ -337,34 +302,33 @@
     <!-- ALERTS -->
     <section id="alerts" class="section-card">
         <div class="section-header">
-            <div class="section-title"><span class="icon">🔔</span> Alerts <span class="badge-count">3 new</span></div>
-            <button class="btn btn-dark">+ Create Alert</button>
+            <div class="section-title">
+                <span class="icon">🔔</span> Alerts
+                <% if (unreadCount > 0) { %><span class="badge-count"><%= unreadCount %> new</span><% } %>
+            </div>
         </div>
         <div class="alert-list">
-            <div class="alert-item warn">
-                <div class="alert-body"><span class="alert-icon">⚠️</span>
-                    <div><div class="alert-title">TSLA dropped below alert threshold</div>
-                    <div class="alert-desc">Current price $178.20 — below your alert at $180</div></div>
+        <% if (alerts != null && !alerts.isEmpty()) {
+               for (Alert a : alerts) {
+                   String sev = "HIGH".equalsIgnoreCase(a.getSeverity()) ? "danger" : "warn";
+                   String icon = "HIGH".equalsIgnoreCase(a.getSeverity()) ? "📉" : "⚠️";
+        %>
+        <div class="alert-item <%= sev%>">
+            <div class="alert-body">
+                <span class="alert-icon"><%= icon%></span>
+                <div>
+                    <div class="alert-title"><%= a.getMessage()%></div>
+                    <div class="alert-desc">Asset ID: <%= a.getAssetId()%></div>
                 </div>
-                <div class="alert-meta"><span class="alert-time">10 minutes ago</span>
-                    <button class="btn btn-outline btn-sm">View</button></div>
             </div>
-            <div class="alert-item success">
-                <div class="alert-body"><span class="alert-icon">✅</span>
-                    <div><div class="alert-title">AAPL reached price target</div>
-                    <div class="alert-desc">Current price $213.49 — exceeded your target of $210</div></div>
-                </div>
-                <div class="alert-meta"><span class="alert-time">1 hour ago</span>
-                    <button class="btn btn-outline btn-sm">View</button></div>
+            <div class="alert-meta">
+                <span class="alert-time"><%= a.getTimestamp()%></span>
+                <button class="btn btn-outline btn-sm">View</button>
             </div>
-            <div class="alert-item danger">
-                <div class="alert-body"><span class="alert-icon">📉</span>
-                    <div><div class="alert-title">ACB dropped sharply today</div>
-                    <div class="alert-desc">Down 1.1% — monitor closely</div></div>
-                </div>
-                <div class="alert-meta"><span class="alert-time">3 hours ago</span>
-                    <button class="btn btn-outline btn-sm">View</button></div>
-            </div>
+        </div>
+        <% } } else { %>
+        <p style="color:var(--text-muted);font-size:13px;text-align:center;padding:24px 0;">No alerts found.</p>
+        <% } %>
         </div>
     </section>
 
@@ -405,14 +369,14 @@
         </div>
     </section>
 
-</div>
+</div><!-- /.content -->
 
 <script>
 (function () {
     const navbar  = document.querySelector('.navbar');
     const navTabs = document.querySelector('.nav-tabs');
     function getOffset() {
-        return (navbar ? navbar.offsetHeight : 64)
+        return (navbar  ? navbar.offsetHeight  : 64)
              + (navTabs ? navTabs.offsetHeight : 48) + 8;
     }
     document.querySelectorAll('.nav-tabs .tab-link').forEach(link => {
@@ -437,5 +401,6 @@
     onScroll();
 })();
 </script>
+
 </body>
 </html>
