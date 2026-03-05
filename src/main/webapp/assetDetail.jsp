@@ -55,7 +55,7 @@
 
                                         <div class="mb-3">
                                             <label class="form-label small fw-bold text-secondary text-uppercase">Symbol</label>
-                                            <input type="text" class="form-control form-control-lg bg-black border-secondary text-info fw-bold" name="symbol" value="<%= old.getSymbol()%>" readonly>
+                                            <input type="text" class="form-control form-control-lg bg-black border-secondary text-info fw-bold" name="symbol" value="<%= old.getSymbol()%>" >
                                         </div>
 
                                         <div class="mb-3">
