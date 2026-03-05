@@ -306,28 +306,62 @@
                 <span class="icon">🔔</span> Alerts
                 <% if (unreadCount > 0) { %><span class="badge-count"><%= unreadCount %> new</span><% } %>
             </div>
+            <a href="MainController?action=show-create-alert" class="btn btn-dark">+ Create Alert</a>
         </div>
         <div class="alert-list">
         <% if (alerts != null && !alerts.isEmpty()) {
                for (Alert a : alerts) {
-                   String sev = "HIGH".equalsIgnoreCase(a.getSeverity()) ? "danger" : "warn";
-                   String icon = "HIGH".equalsIgnoreCase(a.getSeverity()) ? "📉" : "⚠️";
+                   String sev  = "HIGH".equalsIgnoreCase(a.getSeverity())   ? "danger"
+                               : "MEDIUM".equalsIgnoreCase(a.getSeverity()) ? "warn" : "success";
+                   String icon = "HIGH".equalsIgnoreCase(a.getSeverity())   ? "📉"
+                               : "MEDIUM".equalsIgnoreCase(a.getSeverity()) ? "⚠️"  : "🔔";
+
+                   // Parse condition tag: [CONDITION:PRICE_ABOVE:200.0] rest of message
+                   String rawMsg   = a.getMessage() != null ? a.getMessage() : "";
+                   String condDesc = "";
+                   String userMsg  = rawMsg;
+                   if (rawMsg.startsWith("[CONDITION:")) {
+                       int end = rawMsg.indexOf("]");
+                       if (end > 0) {
+                           String tag    = rawMsg.substring(11, end);   // PRICE_ABOVE:200.0
+                           String[] parts = tag.split(":");
+                           if (parts.length == 2) {
+                               condDesc = parts[0].replace("_"," ") + " " + parts[1];
+                           }
+                           userMsg = rawMsg.substring(end + 1).trim();
+                       }
+                   }
         %>
         <div class="alert-item <%= sev%>">
             <div class="alert-body">
                 <span class="alert-icon"><%= icon%></span>
                 <div>
-                    <div class="alert-title"><%= a.getMessage()%></div>
-                    <div class="alert-desc">Asset ID: <%= a.getAssetId()%></div>
+                    <div class="alert-title"><%= userMsg.isEmpty() ? "(No message)" : userMsg %></div>
+                    <div class="alert-desc" style="display:flex;gap:12px;margin-top:3px;">
+                        <% if (!condDesc.isEmpty()) { %>
+                        <span style="background:var(--bg-hover);padding:1px 8px;border-radius:4px;font-size:11px;">
+                            📌 <%= condDesc%>
+                        </span>
+                        <% } %>
+                        <span>Status: <strong style="color:var(--text-primary)"><%= a.getStatus()%></strong></span>
+                        <span>Severity: <strong style="color:var(--text-primary)"><%= a.getSeverity()%></strong></span>
+                    </div>
                 </div>
             </div>
             <div class="alert-meta">
                 <span class="alert-time"><%= a.getTimestamp()%></span>
-                <button class="btn btn-outline btn-sm">View</button>
+                <form action="MainController" method="POST" style="display:inline">
+                    <input type="hidden" name="action" value="delete-alert">
+                    <input type="hidden" name="alertId" value="<%= a.getAlertId()%>">
+                    <button type="submit" class="btn btn-danger btn-sm"
+                            onclick="return confirm('Delete this alert?')">🗑</button>
+                </form>
             </div>
         </div>
         <% } } else { %>
-        <p style="color:var(--text-muted);font-size:13px;text-align:center;padding:24px 0;">No alerts found.</p>
+        <p style="color:var(--text-muted);font-size:13px;text-align:center;padding:24px 0;">
+            No alerts yet. Create one to get notified!
+        </p>
         <% } %>
         </div>
     </section>

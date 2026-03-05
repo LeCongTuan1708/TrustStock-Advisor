@@ -40,8 +40,8 @@ public class MainController extends HttpServlet {
     private static final String UPDATE_PROFILE_CONTROLLER = "UpdateProfileController";
     private static final String PORTFOLIO = "portfolio";
     private static final String PORTFOLIO_CONTROLLER = "PortfolioController";
-    private static final String USER_DASHBOARD="dashboard";
-    private static final String USER_DASHBOARD_CONTROLLER="DashBoardController";
+    private static final String USER_DASHBOARD = "dashboard";
+    private static final String USER_DASHBOARD_CONTROLLER = "DashBoardController";
 
     private static final String LOGOUT_Controller = "logoutController";
 
@@ -82,7 +82,11 @@ public class MainController extends HttpServlet {
 
     private static final String REMOVE_CARE_NOTE = "remove-care-note";
     private static final String REMOVE_CARE_NOTE_CONTROLLER = "RemoveCareNoteController";
-
+    private static final String SHOW_CREATE_ALERT = "show-create-alert";
+    private static final String CREATE_ALERT_CONTROLLER = "CreateAlertController";
+    private static final String DELETE_ALERT = "delete-alert";
+    private static final String DELETE_ALERT_CONTROLLER = "DeleteAlertController";
+    private static final String CREATE_ALERT = "create-alert";
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
@@ -112,10 +116,10 @@ public class MainController extends HttpServlet {
                 url = UPDATE_PROFILE_CONTROLLER;
             } else if (PORTFOLIO.equals(action)) {
                 url = PORTFOLIO_CONTROLLER;
-            }else if(USER_DASHBOARD.equals(action)){
-                url =USER_DASHBOARD_CONTROLLER;
-            
-            }else if (WATCH_LIST.equals(action)) {
+            } else if (USER_DASHBOARD.equals(action)) {
+                url = USER_DASHBOARD_CONTROLLER;
+
+            } else if (WATCH_LIST.equals(action)) {
                 url = WATCH_LIST_CONTROLLER;
             } else if (EDIT_WATCHLIST.equals(action)) {
                 url = EDIT_WATCHLIST_CONTROLLER;
@@ -153,26 +157,34 @@ public class MainController extends HttpServlet {
                 url = EDIT_USER_CONTROLLER;
             } else if (LOGOUT.equals(action)) {
                 url = LOGOUT_Controller;
-            } else {
+            } else if (SHOW_CREATE_ALERT.equals(action)) {
+                url = CREATE_ALERT_CONTROLLER;
+            } else if (CREATE_ALERT.equals(action)) {
+                url = CREATE_ALERT_CONTROLLER;
+            } else if (DELETE_ALERT.equals(action)) {
+                url = DELETE_ALERT_CONTROLLER;
+            }else {
                 request.setAttribute("ERROR", "Your action not support");
             }
-        } catch (Exception e) {
+            }catch (Exception e) {
             log("Error at MainController: " + e.toString());
-        } finally {
+        }finally {
             request.getRequestDispatcher(url).forward(request, response);
         }
-    }
+        }
 
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+        @Override
+        protected void doGet
+        (HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
-    }
+            processRequest(request, response);
+        }
 
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+        @Override
+        protected void doPost
+        (HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
-    }
+            processRequest(request, response);
+        }
 
-}
+    }
