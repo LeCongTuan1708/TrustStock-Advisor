@@ -29,15 +29,15 @@
         TrustStock
     </div>
     <div class="navbar-right">
-        <span class="navbar-greeting">Xin chào, <strong><%= acc.getUsername()%></strong></span>
+        <span class="navbar-greeting">Welcome, <strong><%= acc.getUsername()%></strong></span>
         <div class="navbar-avatar"><%= acc.getUsername().substring(0, 1).toUpperCase()%></div>
-        <a href="MainController?action=logout" class="navbar-logout">Đăng xuất</a>
+        <a href="MainController?action=logout" class="navbar-logout">Logout</a>
     </div>
 </nav>
 
 <!-- ===== NAVIGATION TABS ===== -->
 <div class="nav-tabs">
-    <a href="#account" class="tab-link active"><span class="icon">👤</span> Account</a>
+    <a href="#account"   class="tab-link active"><span class="icon">👤</span> Account</a>
     <a href="#market"    class="tab-link"><span class="icon">📊</span> Market</a>
     <a href="#portfolio" class="tab-link"><span class="icon">💼</span> Portfolio</a>
     <a href="#watchlist" class="tab-link"><span class="icon">👁️</span> WatchList</a>
@@ -355,42 +355,55 @@
 </div><!-- /.content -->
 
 <script>
-    const OFFSET = 112 + 20; // navbar(64) + nav-tabs(48) + gap
+(function () {
+    // Tính offset = navbar + nav-tabs
+    const navbar  = document.querySelector('.navbar');
+    const navTabs = document.querySelector('.nav-tabs');
 
-    // ── 1. Click tab → smooth scroll đến đúng section ──
+    function getOffset() {
+        return (navbar ? navbar.offsetHeight : 64)
+             + (navTabs ? navTabs.offsetHeight : 48)
+             + 8; // buffer nhỏ
+    }
+
+    // ── Click tab → scroll đến section ──
     document.querySelectorAll('.nav-tabs .tab-link').forEach(link => {
-        link.addEventListener('click', function(e) {
+        link.addEventListener('click', function (e) {
             e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
+            const id = this.getAttribute('href').replace('#', '');
+            const target = document.getElementById(id);
             if (!target) return;
-            const top = target.getBoundingClientRect().top + window.scrollY - OFFSET;
-            window.scrollTo({ top: top, behavior: 'smooth' });
+
+            const top = target.getBoundingClientRect().top + window.scrollY - getOffset();
+            window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+
+            // Highlight ngay lập tức
+            document.querySelectorAll('.nav-tabs .tab-link').forEach(l => l.classList.remove('active'));
+            this.classList.add('active');
         });
     });
 
-    // ── 2. Scroll → tự highlight tab tương ứng ──
+    // ── Scroll → highlight tab tương ứng ──
     const sections = Array.from(document.querySelectorAll('section[id]'));
     const tabLinks  = Array.from(document.querySelectorAll('.nav-tabs .tab-link'));
 
     function onScroll() {
-        // Tìm section đang hiển thị gần top nhất (sau offset)
+        const offset = getOffset() + 16;
         let current = sections[0];
         for (const sec of sections) {
-            const rect = sec.getBoundingClientRect();
-            if (rect.top <= OFFSET + 10) {
+            if (sec.getBoundingClientRect().top <= offset) {
                 current = sec;
             }
         }
         tabLinks.forEach(link => {
-            link.classList.remove('active');
-            if (link.getAttribute('href') === '#' + current.id) {
-                link.classList.add('active');
-            }
+            link.classList.toggle('active',
+                link.getAttribute('href') === '#' + current.id);
         });
     }
 
     window.addEventListener('scroll', onScroll, { passive: true });
-    onScroll(); // chạy lần đầu khi load
+    onScroll();
+})();
 </script>
 
 </body>
