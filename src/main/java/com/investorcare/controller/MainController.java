@@ -40,8 +40,8 @@ public class MainController extends HttpServlet {
     private static final String UPDATE_PROFILE_CONTROLLER = "UpdateProfileController";
     private static final String PORTFOLIO = "portfolio";
     private static final String PORTFOLIO_CONTROLLER = "PortfolioController";
-    private static final String USER_DASHBOARD="dashboard";
-    private static final String USER_DASHBOARD_CONTROLLER="DashBoardController";
+    private static final String USER_DASHBOARD = "dashboard";
+    private static final String USER_DASHBOARD_CONTROLLER = "DashBoardController";
 
     private static final String LOGOUT_Controller = "logoutController";
 
@@ -83,6 +83,10 @@ public class MainController extends HttpServlet {
     private static final String REMOVE_CARE_NOTE = "remove-care-note";
     private static final String REMOVE_CARE_NOTE_CONTROLLER = "RemoveCareNoteController";
 
+    // Mới thêm: Xem chi tiết Care Note
+    private static final String VIEW_CARE_NOTE = "view-care-note";
+    private static final String VIEW_CARE_NOTE_CONTROLLER = "ViewCareNoteController";
+
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
@@ -112,10 +116,10 @@ public class MainController extends HttpServlet {
                 url = UPDATE_PROFILE_CONTROLLER;
             } else if (PORTFOLIO.equals(action)) {
                 url = PORTFOLIO_CONTROLLER;
-            }else if(USER_DASHBOARD.equals(action)){
-                url =USER_DASHBOARD_CONTROLLER;
-            
-            }else if (WATCH_LIST.equals(action)) {
+            } else if (USER_DASHBOARD.equals(action)) {
+                url = USER_DASHBOARD_CONTROLLER;
+
+            } else if (WATCH_LIST.equals(action)) {
                 url = WATCH_LIST_CONTROLLER;
             } else if (EDIT_WATCHLIST.equals(action)) {
                 url = EDIT_WATCHLIST_CONTROLLER;
@@ -153,6 +157,8 @@ public class MainController extends HttpServlet {
                 url = EDIT_USER_CONTROLLER;
             } else if (LOGOUT.equals(action)) {
                 url = LOGOUT_Controller;
+            } else if (VIEW_CARE_NOTE.equals(action)) {
+                url = VIEW_CARE_NOTE_CONTROLLER;
             } else {
                 request.setAttribute("ERROR", "Your action not support");
             }
