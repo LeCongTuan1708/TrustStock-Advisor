@@ -24,7 +24,7 @@
 <nav class="navbar">
     <div class="navbar-brand">
         <div class="navbar-brand-icon">📈</div>
-        TrustStock
+        InvestorCare
     </div>
     <div class="navbar-right">
         <span class="navbar-greeting">Welcome, <strong><%= acc.getUsername()%></strong></span>
