@@ -48,7 +48,19 @@ public class WatchListDAO {
         }
         return checkInsert;
     }
-
+    public String getWatchListNameById(int id) throws Exception {
+        String name = "";
+        String sql = "SELECT NAME FROM WATCHLIST WHERE WATCHLIST_ID = ?";
+        try ( Connection con = JDBCUtils.getConnection();  PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            try ( ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    name = rs.getString("NAME");
+                }
+            }
+        }
+        return name;
+    }
     public boolean updateNameWatchList(int watchListId, String nameUpdate) throws SQLException {
         boolean checkUpdate = false;
         Connection conn = null;

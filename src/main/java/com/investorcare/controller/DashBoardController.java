@@ -2,9 +2,11 @@ package com.investorcare.controller;
 
 import com.investorcare.dao.AlertDAO;
 import com.investorcare.dao.AssetDAO;
+import com.investorcare.dao.CareNoteDAO;
 import com.investorcare.dao.PortfolioDAO;
 import com.investorcare.dao.PortfolioHoldingDAO;
 import com.investorcare.dao.PriceBarDAO;
+import com.investorcare.dao.WatchListDAO;
 import com.investorcare.model.Asset;
 import com.investorcare.model.AssetQuote;
 import com.investorcare.model.Portfolio;
@@ -146,9 +148,27 @@ public class DashBoardController extends HttpServlet {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        
+        // --- 8. LOAD WATCHLIST CỦA QUÝ ---
+        try {
+            WatchListDAO wlDao = new WatchListDAO();
+            request.setAttribute("watchLists", wlDao.getWatchListByUserId(user.getUserId()));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // --- 9. LOAD CARE NOTE CỦA QUÝ ---
+        try {
+            CareNoteDAO cnDao = new CareNoteDAO();
+            request.setAttribute("careNotes", cnDao.getCareNoteByUserId(user.getUserId()));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         request.getRequestDispatcher("userDashboard.jsp").forward(request, response);
     }
+    
+    
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res)

@@ -124,7 +124,7 @@
 <body>
 
 <nav class="navbar">
-    <a href="MainController?action=user-dash-board" class="navbar-brand">
+    <a href="MainController?action=dashboard" class="navbar-brand">
         <div class="navbar-brand-icon">📈</div>
         InvestorCare
     </a>

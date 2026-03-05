@@ -6,6 +6,7 @@
 <%@page import="com.investorcare.model.Asset"%>
 <%@page import="java.util.*"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%
     User acc = (User) session.getAttribute("LOGIN_USER");
     if (acc == null) { response.sendRedirect("login.jsp"); return; }
@@ -263,39 +264,56 @@
     <% } %>
 
     <!-- WATCHLIST -->
-    <section id="watchlist" class="section-card">
-        <div class="section-header">
+    <section id="watchlist" class="section-card" style="background: transparent; border: none; padding: 0; margin-bottom: 24px;">
+        <div class="section-header" style="margin-bottom: 20px;">
             <div class="section-title"><span class="icon">👁️</span> WatchList</div>
-            <a href="MainController?action=watch-list" class="btn btn-dark">Manage WatchList</a>
+            <a href="MainController?action=watch-list" class="btn btn-dark" style="text-decoration:none;">Manage WatchList</a>
         </div>
-        <div class="watchlist-grid">
-            <div class="watchlist-card">
-                <div class="watchlist-card-header">
-                    <div><div class="ticker-symbol">NVDA</div><div class="ticker-name">NVIDIA Corp.</div></div>
-                    <button class="btn-remove">✕</button>
+
+        <div class="watchlist-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px;">
+
+            <c:forEach items="${watchLists}" var="wl" varStatus="status">
+                <c:choose>
+                    <c:when test="${status.index % 4 == 0}"><c:set var="wlColor" value="#00e5a0"/></c:when>
+                    <c:when test="${status.index % 4 == 1}"><c:set var="wlColor" value="#3b82f6"/></c:when>
+                    <c:when test="${status.index % 4 == 2}"><c:set var="wlColor" value="#a855f7"/></c:when>
+                    <c:otherwise><c:set var="wlColor" value="#f59e0b"/></c:otherwise>
+                </c:choose>
+
+                <div class="watchlist-card" 
+                     style="background: #111d30; border: 1px solid #1e3050; border-radius: 12px; padding: 18px; cursor: pointer; display: flex; align-items: center; gap: 16px; transition: all 0.25s ease;"
+                     onclick="window.location.href='MainController?action=watchlist-item&selectedId=${wl.watchListId}'"
+                     onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,.4)'; this.style.borderColor='${wlColor}';"
+                     onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'; this.style.borderColor='#1e3050';">
+
+                    <div style="width: 48px; height: 48px; min-width: 48px; border-radius: 12px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center; font-size: 22px; color: ${wlColor};">
+                        📂
+                    </div>
+
+                    <div style="flex: 1; overflow: hidden;">
+                        <div class="ticker-symbol" style="font-size: 16px; font-weight: 600; color: #e8f0fc; margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                            ${wl.name}
+                        </div>
+                        <div class="ticker-name" style="font-size: 12px; color: #7a94b8; display: flex; align-items: center; gap: 4px;">
+                            <span>🗓</span> ${wl.createAt}
+                        </div>
+                    </div>
+
+                    <div style="color: #3d5270; font-size: 16px; font-weight: bold; transition: color 0.2s;" onmouseover="this.style.color='${wlColor}'" onmouseout="this.style.color='#3d5270'">
+                        →
+                    </div>
                 </div>
-                <div class="ticker-price">$875.40</div>
-                <div class="ticker-change text-green">▲ +2.1% today</div>
-                <button class="btn btn-light btn-sm" style="width:100%;margin-top:8px;">Add to Portfolio</button>
-            </div>
-            <div class="watchlist-card">
-                <div class="watchlist-card-header">
-                    <div><div class="ticker-symbol">META</div><div class="ticker-name">Meta Platforms</div></div>
-                    <button class="btn-remove">✕</button>
+
+            </c:forEach>
+
+            <c:if test="${empty watchLists}">
+                <div style="padding: 40px 20px; color: #7a94b8; grid-column: 1 / -1; text-align: center; background: #111d30; border-radius: 12px; border: 1px dashed #1e3050;">
+                    <div style="font-size: 36px; margin-bottom: 12px; opacity: 0.5;">📁</div>
+                    <div style="font-size: 16px; font-weight: 600; margin-bottom: 8px; color: #e8f0fc;">Chưa có thư mục theo dõi</div>
+                    <p style="font-size: 13px; margin-bottom: 16px;">Tạo danh sách để dễ dàng theo dõi các mã cổ phiếu tiềm năng.</p>
+                    <a href="MainController?action=watch-list" class="btn btn-dark" style="text-decoration: none; padding: 8px 16px; font-size: 13px; border: 1px solid #1e3050; border-radius: 8px;">Thiết lập ngay</a>
                 </div>
-                <div class="ticker-price">$512.10</div>
-                <div class="ticker-change text-green">▲ +0.9% today</div>
-                <button class="btn btn-light btn-sm" style="width:100%;margin-top:8px;">Add to Portfolio</button>
-            </div>
-            <div class="watchlist-card">
-                <div class="watchlist-card-header">
-                    <div><div class="ticker-symbol">VNM</div><div class="ticker-name">Vinamilk</div></div>
-                    <button class="btn-remove">✕</button>
-                </div>
-                <div class="ticker-price">68,500₫</div>
-                <div class="ticker-change text-red">▼ -0.7% today</div>
-                <button class="btn btn-light btn-sm" style="width:100%;margin-top:8px;">Add to Portfolio</button>
-            </div>
+            </c:if>
         </div>
     </section>
 
@@ -333,39 +351,63 @@
     </section>
 
     <!-- CARE NOTE -->
-    <section id="carenote" class="section-card">
-        <div class="section-header">
+    <section id="carenote" class="section-card" style="background: transparent; border: none; padding: 0;">
+        <div class="section-header" style="margin-bottom: 20px;">
             <div class="section-title"><span class="icon">📝</span> Care Note</div>
-            <a href="MainController?action=care-note-list" class="btn btn-dark">+ Add Note</a>
+            <a href="MainController?action=care-note-list" class="btn btn-dark" style="text-decoration:none;">Manage Care Note</a>
         </div>
-        <div class="note-grid">
-            <div class="note-card blue">
-                <div class="note-header">
-                    <div class="note-title blue">📌 This week's strategy</div>
-                    <div class="note-actions"><button class="btn-icon">✏️</button><button class="btn-icon">🗑️</button></div>
+
+        <div class="note-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px;">
+
+            <%-- Vòng lặp lấy data y như trang chi tiết, có kèm cả logic đổi màu CSS --%>
+            <c:forEach items="${careNotes}" var="note" varStatus="status">
+                <c:choose>
+                    <c:when test="${status.index % 5 == 0}"><c:set var="colorClass" value="color-teal"/></c:when>
+                    <c:when test="${status.index % 5 == 1}"><c:set var="colorClass" value="color-blue"/></c:when>
+                    <c:when test="${status.index % 5 == 2}"><c:set var="colorClass" value="color-amber"/></c:when>
+                    <c:when test="${status.index % 5 == 3}"><c:set var="colorClass" value="color-purple"/></c:when>
+                    <c:otherwise><c:set var="colorClass" value="color-rose"/></c:otherwise>
+                </c:choose>
+
+                <div class="note-card ${colorClass}" 
+                     style="background: #111d30; border: 1px solid #1e3050; border-radius: 12px; padding: 20px; cursor: pointer; position: relative; overflow: hidden; transition: transform .2s, box-shadow .2s;"
+                     onclick="window.location.href='MainController?action=show-edit-care-note&noteId=${note.noteId}'"
+                     onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,.4)';"
+                     onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+
+                    <div style="position: absolute; top: 0; left: 0; right: 0; height: 3px;
+                         ${status.index % 5 == 0 ? 'background: linear-gradient(90deg, #00e5a0, #00bcd4);' : 
+                           status.index % 5 == 1 ? 'background: linear-gradient(90deg, #3b82f6, #6366f1);' : 
+                           status.index % 5 == 2 ? 'background: linear-gradient(90deg, #f59e0b, #ef4444);' : 
+                           status.index % 5 == 3 ? 'background: linear-gradient(90deg, #a855f7, #ec4899);' : 
+                           'background: linear-gradient(90deg, #f43f5e, #f97316);'}">
+                    </div>
+
+                    <div class="note-top" style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                        <span class="note-ticker" style="background: rgba(0,229,160,.1); border: 1px solid rgba(0,229,160,.25); color: #00e5a0; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 700;">
+                            📌 ${note.asset.symbol != null ? note.asset.symbol : 'Ghi chú'}
+                        </span>
+                    </div>
+
+                    <div class="note-title" style="font-size: 15px; font-weight: 600; color: #e8f0fc; margin-bottom: 8px; line-height: 1.4;">
+                        ${note.title}
+                    </div>
+
+                    <div class="note-content" style="font-size: 13px; color: #7a94b8; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 14px;">
+                        ${note.content}
+                    </div>
+
+                    <div class="note-footer" style="padding-top: 12px; border-top: 1px solid #1e3050; font-size: 11px; color: #3d5270;">
+                        🗓 Cập nhật: ${note.updatedAt}
+                    </div>
                 </div>
-                <div class="note-body">Monitor AAPL before Q1 earnings report. Hold MSFT long-term. Consider rebalancing end of month.</div>
-                <div class="note-date">24/02/2026</div>
-            </div>
-            <div class="note-card purple">
-                <div class="note-header">
-                    <div class="note-title purple">💡 Reminder</div>
-                    <div class="note-actions"><button class="btn-icon">✏️</button><button class="btn-icon">🗑️</button></div>
+            </c:forEach>
+
+            <c:if test="${empty careNotes}">
+                <div style="padding: 30px; color: #7a94b8; grid-column: 1 / -1; text-align: center; background: #111d30; border-radius: 12px; border: 1px dashed #1e3050;">
+                    Chưa có nhật ký nào. Bấm 'Manage Care Note' để bắt đầu ghi chép nhé!
                 </div>
-                <div class="note-body">Consider cutting TSLA if it continues below $175. Set stop-loss at $170.</div>
-                <div class="note-date">25/02/2026</div>
-            </div>
-            <div class="note-card orange">
-                <div class="note-header">
-                    <div class="note-title orange">🎯 March Target</div>
-                    <div class="note-actions"><button class="btn-icon">✏️</button><button class="btn-icon">🗑️</button></div>
-                </div>
-                <div class="note-body">Reach total assets of $30,000. Open more NVDA position if price drops to $850.</div>
-                <div class="note-date">20/02/2026</div>
-            </div>
-            <div class="note-card empty">
-                <a href="MainController?action=care-note-list" style="text-decoration:none;color:inherit;">+ Add new note</a>
-            </div>
+            </c:if>
         </div>
     </section>
 
