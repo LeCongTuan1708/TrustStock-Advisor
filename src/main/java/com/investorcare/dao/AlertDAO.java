@@ -247,4 +247,19 @@ public class AlertDAO {
             return 0;
         }
     }
+    public int updateAlert(Alert alert) {
+        String sql = "UPDATE ALERT SET ASSET_ID=?, SEVERITY=?, MESSAGE=?, STATUS=? WHERE ALERT_ID=?";
+        try (Connection conn = JDBCUtils.getConnection(); 
+             PreparedStatement pst = conn.prepareStatement(sql)) {
+            pst.setInt(1, alert.getAssetId());
+            pst.setString(2, alert.getSeverity());
+            pst.setString(3, alert.getMessage());
+            pst.setString(4, alert.getStatus());
+            pst.setInt(5, alert.getAlertId());
+            return pst.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
 }

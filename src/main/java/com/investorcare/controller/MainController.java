@@ -87,6 +87,14 @@ public class MainController extends HttpServlet {
     private static final String DELETE_ALERT = "delete-alert";
     private static final String DELETE_ALERT_CONTROLLER = "DeleteAlertController";
     private static final String CREATE_ALERT = "create-alert";
+    private static final String SHOW_VIEW_ALERT = "show-view-alert";
+    private static final String SHOW_VIEW_ALERT_CONTROLLER = "ShowViewAlertController";
+    
+    private static final String SHOW_EDIT_ALERT = "show-edit-alert";
+    private static final String SHOW_EDIT_ALERT_CONTROLLER = "ShowEditAlertController";
+    
+    private static final String UPDATE_ALERT = "update-alert";
+    private static final String UPDATE_ALERT_CONTROLLER = "UpdateAlertController";
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
@@ -163,6 +171,12 @@ public class MainController extends HttpServlet {
                 url = CREATE_ALERT_CONTROLLER;
             } else if (DELETE_ALERT.equals(action)) {
                 url = DELETE_ALERT_CONTROLLER;
+            } else if (SHOW_VIEW_ALERT.equals(action)) {
+                url = SHOW_VIEW_ALERT_CONTROLLER;
+            } else if (SHOW_EDIT_ALERT.equals(action)) {
+                url = SHOW_EDIT_ALERT_CONTROLLER;
+            } else if (UPDATE_ALERT.equals(action)) {
+                url = UPDATE_ALERT_CONTROLLER;
             }else {
                 request.setAttribute("ERROR", "Your action not support");
             }
