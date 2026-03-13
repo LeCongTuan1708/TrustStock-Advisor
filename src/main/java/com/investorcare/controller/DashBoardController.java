@@ -2,9 +2,11 @@ package com.investorcare.controller;
 
 import com.investorcare.dao.AlertDAO;
 import com.investorcare.dao.AssetDAO;
+import com.investorcare.dao.CareNoteDAO;
 import com.investorcare.dao.PortfolioDAO;
 import com.investorcare.dao.PortfolioHoldingDAO;
 import com.investorcare.dao.PriceBarDAO;
+import com.investorcare.dao.WatchListDAO;
 import com.investorcare.model.Asset;
 import com.investorcare.model.AssetQuote;
 import com.investorcare.model.Portfolio;
@@ -80,35 +82,32 @@ public class DashBoardController extends HttpServlet {
         SignalEngine engine = new SignalEngine();
 
         for (Asset a : assets) {
-
             AssetQuote q = apiQuotes.getOrDefault(a.getSymbol(), new AssetQuote());
             quoteMap.put(a.getAssetId(), q);
 
             if (q.getCurrentPrice() > 0) {
-
                 try {
-
                     PriceBar latest = priceBarDAO.getLatest(a.getAssetId());
 
+                    // Nếu chưa có lịch sử HOẶC giá đóng cửa khác giá hiện tại thì mới lưu
                     if (latest == null || latest.getClose() != q.getCurrentPrice()) {
 
-                        assetDAO.savePriceToHistory(a.getAssetId(), q.getCurrentPrice());
+                        // Gọi hàm savePriceToHistory mới đã được update ở DAO
+                        assetDAO.savePriceToHistory(a.getAssetId(), q);
 
                         // Trigger Signal + Alert system
                         engine.checkVolatility(a.getAssetId(), user.getUserId());
-
                     }
-
                 } catch (Exception e) {
                     System.out.println(">>> Save price error: " + e.getMessage());
                 }
-
             }
         }
 
         request.setAttribute("assets", assets);
         request.setAttribute("quotes", quoteMap);
         request.setAttribute("portfolios", portfolios);
+
 
         // ── 6. Load holdings nếu user mở portfolio ──
         String openParam = request.getParameter("openPortfolioId");
@@ -146,9 +145,27 @@ public class DashBoardController extends HttpServlet {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        
+        // --- 8. LOAD WATCHLIST CỦA QUÝ ---
+        try {
+            WatchListDAO wlDao = new WatchListDAO();
+            request.setAttribute("watchLists", wlDao.getWatchListByUserId(user.getUserId()));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // --- 9. LOAD CARE NOTE CỦA QUÝ ---
+        try {
+            CareNoteDAO cnDao = new CareNoteDAO();
+            request.setAttribute("careNotes", cnDao.getCareNoteByUserId(user.getUserId()));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         request.getRequestDispatcher("userDashboard.jsp").forward(request, response);
     }
+    
+    
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res)

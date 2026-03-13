@@ -82,6 +82,7 @@
                                         String currentRole = request.getParameter("role");
                                         currentRole = (currentRole == null) ? "" : currentRole;
                                     %>
+                                    
                                     <label class="form-label small fw-bold text-info">ROLE</label>
                                     <select name="role" class="form-select bg-black text-white border-secondary" onchange="this.form.submit()">
                                         <option value="" <%= currentRole.equals("") ? "selected" : ""%>>All Roles</option>

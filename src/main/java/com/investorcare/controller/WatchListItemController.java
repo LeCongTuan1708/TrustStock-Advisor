@@ -5,11 +5,15 @@
 package com.investorcare.controller;
 
 import com.investorcare.dao.WatchListItemDAO;
+import com.investorcare.dao.PriceBarDAO;
 import com.investorcare.model.User;
 import com.investorcare.model.WatchListItem;
+import com.investorcare.model.PriceBar;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -22,25 +26,13 @@ import javax.servlet.http.HttpSession;
  */
 public class WatchListItemController extends HttpServlet {
 
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     * @throws java.sql.SQLException
-     */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         HttpSession session = request.getSession();
         
         String url = "MainController?action=watch-list";
-        
         try {
-            WatchListItemDAO dao = new WatchListItemDAO();  
             User loginUser = (User) session.getAttribute("LOGIN_USER");
             String selectedIdStr = request.getParameter("selectedId");
             
@@ -48,14 +40,42 @@ public class WatchListItemController extends HttpServlet {
                 if (selectedIdStr != null && !selectedIdStr.isEmpty()) {
                     
                     int watchListId = Integer.parseInt(selectedIdStr);
-
+                    com.investorcare.dao.WatchListDAO wlDao = new com.investorcare.dao.WatchListDAO();
+                    String watchListName = "Danh mục #" + watchListId;
+                    watchListName = wlDao.getWatchListNameById(watchListId);
                     WatchListItemDAO itemDao = new WatchListItemDAO();
-
                     List<WatchListItem> listItems = itemDao.getItemsByWatchListId(watchListId);
-
                     request.setAttribute("LIST_WATCHLIST_ITEM", listItems);
-
                     request.setAttribute("CURRENT_WATCHLIST_ID", watchListId);
+                    request.setAttribute("WATCHLIST_NAME", watchListName);
+                    // ==============================================================
+                    // BẮT ĐẦU MÓC GIÁ TỪ DATABASE LÊN 
+                    // ==============================================================
+                    Map<Integer, PriceBar> latestPrices = new HashMap<>();
+                    PriceBarDAO priceBarDAO = new PriceBarDAO();
+
+                    if (listItems != null) {
+                        for (WatchListItem item : listItems) {
+                            if (item.getAsset() != null) {
+                                int assetId = item.getAsset().getAssetId();
+                                try {
+                                    // Lấy dòng giá mới nhất của từng mã cổ phiếu
+                                    PriceBar latest = priceBarDAO.getLatest(assetId);
+                                    if (latest != null) {
+                                        latestPrices.put(assetId, latest);
+                                    }
+                                } catch (Exception ex) {
+                                    System.out.println(">>> Lỗi lấy giá cho Asset " + assetId + ": " + ex.getMessage());
+                                }
+                            }
+                        }
+                    }
+                    
+                    // Ném nguyên cái Map giá trị này sang JSP với tên "LATEST_PRICES"
+                    request.setAttribute("LATEST_PRICES", latestPrices);
+                    // ==================================================== ==========
+                    // KẾT THÚC MÓC GIÁ
+                    // ==============================================================
 
                     url = "watchListItem.jsp";
                 }
@@ -67,44 +87,22 @@ public class WatchListItemController extends HttpServlet {
             e.printStackTrace();
         } finally {
             request.getRequestDispatcher(url).forward(request, response);
-
         }
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /**
-     * Handles the HTTP <code>GET</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         processRequest(request, response);
     }
 
-    /**
-     * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         processRequest(request, response);
     }
 
-    /**
-     * Returns a short description of the servlet.
-     *
-     * @return a String containing servlet description
-     */
     @Override
     public String getServletInfo() {
         return "Short description";
