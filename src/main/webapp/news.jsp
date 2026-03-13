@@ -1,8 +1,3 @@
-<%--
-    Document   : news
-    Created on : Mar 13, 2026, 7:37:23 AM
-    Author     : khait
---%>
 <%@page import="com.investorcare.model.News"%>
 <%@page import="com.investorcare.model.User"%>
 <%@page import="java.util.List"%>
@@ -24,6 +19,8 @@
                 return;
             }
             List<News> newsList = (List<News>) request.getAttribute("newsList");
+            String filterSymbol = (String) request.getAttribute("filterSymbol");
+            boolean isFiltered = filterSymbol != null && !filterSymbol.trim().isEmpty();
         %>
 
         <!-- ===== NAVBAR ===== -->
@@ -42,7 +39,10 @@
         <!-- ===== SUB NAV ===== -->
         <div class="nav-tabs">
             <a href="MainController?action=dashboard" class="tab-link"><span class="icon">🏠</span> Dashboard</a>
-            <a href="MainController?action=news" class="tab-link active"><span class="icon">📰</span> News</a>
+            <a href="MainController?action=news" class="tab-link <%= isFiltered ? "" : "active"%>"><span class="icon">📰</span> All News</a>
+            <% if (isFiltered) { %>
+            <a class="tab-link active"><span class="icon">🔍</span> <%= filterSymbol.toUpperCase() %></a>
+            <% } %>
         </div>
 
         <!-- ===== CONTENT ===== -->
@@ -52,10 +52,23 @@
             <div class="news-page-header">
                 <div>
                     <div class="news-page-title">
+                        <% if (isFiltered) { %>
+                        <span class="news-page-icon">🔍</span>
+                        News for <span class="news-symbol-highlight"><%= filterSymbol.toUpperCase() %></span>
+                        <% } else { %>
                         <span class="news-page-icon">📰</span>
                         Market News
+                        <% } %>
                     </div>
-                    <div class="news-page-subtitle">Latest financial & stock market updates</div>
+                    <div class="news-page-subtitle">
+                        <% if (isFiltered) { %>
+                            Latest articles related to <strong><%= filterSymbol.toUpperCase() %></strong>
+                            &nbsp;·&nbsp;
+                            <a href="MainController?action=news" class="news-back-link">← View all news</a>
+                        <% } else { %>
+                            Latest financial &amp; stock market updates
+                        <% } %>
+                    </div>
                 </div>
                 <div class="news-live-badge">
                     <span class="news-live-dot"></span> Live Feed
@@ -74,7 +87,8 @@
                     <div class="news-featured-image-wrap">
                         <% if (featured.getImage() != null && !featured.getImage().isEmpty()) { %>
                         <img src="<%= featured.getImage() %>" alt="<%= featured.getTitle() %>"
-                             class="news-featured-image" onerror="this.style.display='none';this.parentElement.classList.add('no-image')">
+                             class="news-featured-image"
+                             onerror="this.style.display='none';this.parentElement.classList.add('no-image')">
                         <% } %>
                         <div class="news-featured-overlay"></div>
                         <span class="news-tag news-tag-featured">⭐ Featured</span>
@@ -118,16 +132,28 @@
                         </div>
                     </div>
                 </a>
-                <%  } %>
+                <% } %>
             </div>
 
             <% } else { %>
             <!-- EMPTY STATE -->
             <div class="news-empty">
                 <div class="news-empty-icon">📭</div>
-                <div class="news-empty-title">No news available</div>
+                <div class="news-empty-title">
+                    <% if (isFiltered) { %>
+                        No news found for "<%= filterSymbol.toUpperCase() %>"
+                    <% } else { %>
+                        No news available
+                    <% } %>
+                </div>
                 <div class="news-empty-sub">Check back later for the latest market updates.</div>
-                <a href="MainController?action=news" class="btn btn-dark" style="text-decoration:none;margin-top:16px;">🔄 Refresh</a>
+                <div style="display:flex;gap:12px;margin-top:16px;">
+                    <% if (isFiltered) { %>
+                    <a href="MainController?action=news" class="btn btn-light" style="text-decoration:none;">← All News</a>
+                    <% } %>
+                    <a href="MainController?action=news<%= isFiltered ? "&symbol=" + filterSymbol : "" %>"
+                       class="btn btn-dark" style="text-decoration:none;">🔄 Refresh</a>
+                </div>
             </div>
             <% } %>
 

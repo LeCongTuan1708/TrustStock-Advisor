@@ -123,7 +123,13 @@
                                         String arrow = up ? "▲" : "▼";
                             %>
                             <tr>
-                                <td class="bold"><span class="ticker-tag"><%= a.getSymbol()%></span></td>
+                                <td class="bold">
+                                    <a href="MainController?action=news&symbol=<%= a.getSymbol()%>"
+                                       class="ticker-tag ticker-tag-link"
+                                       title="View news for <%= a.getSymbol()%>">
+                                        <%= a.getSymbol()%>
+                                    </a>
+                                </td>
                                 <td class="muted"><%= a.getName()%></td>
                                 <td><span class="exchange-tag"><%= a.getExchange()%></span></td>
                                 <td class="right">

@@ -26,39 +26,37 @@ public class StockNewsController extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
 
         ArrayList<News> list = new ArrayList<>();
+        String filterSymbol = request.getParameter("symbol"); // null nếu xem all
 
         try {
-            // 1. Lấy danh sách symbol từ DB
-            AssetDAO assetDAO = new AssetDAO();
-            List<Asset> assets = assetDAO.getAllAssets();
-            List<String> symbols = assets.stream()
-                    .map(Asset::getSymbol)
-                    .collect(Collectors.toList());
+            String json;
 
-            // 2. Gọi API với symbols — chỉ 1 request duy nhất
-            String json = APIHelper.getNewsBySymbols(symbols);
-
-            if (json == null || json.isEmpty()) {
-                throw new Exception("Empty response from NewsAPI");
+            if (filterSymbol != null && !filterSymbol.trim().isEmpty()) {
+                // Xem tin tức theo 1 symbol cụ thể
+                json = APIHelper.getNewsBySymbol(filterSymbol.trim().toUpperCase());
+            } else {
+                // Xem tất cả — lấy symbols từ DB
+                AssetDAO assetDAO = new AssetDAO();
+                List<Asset> assets = assetDAO.getAllAssets();
+                List<String> symbols = assets.stream()
+                        .map(Asset::getSymbol)
+                        .collect(Collectors.toList());
+                json = APIHelper.getNewsBySymbols(symbols);
             }
 
-            // 3. Parse JSON
+            if (json == null || json.isEmpty()) throw new Exception("Empty API response");
+
             JsonObject obj = JsonParser.parseString(json).getAsJsonObject();
             JsonArray articles = obj.getAsJsonArray("articles");
 
             for (int i = 0; i < articles.size(); i++) {
                 JsonObject article = articles.get(i).getAsJsonObject();
-
                 String title = getString(article, "title");
-                String desc = getString(article, "description");
-                String url = getString(article, "url");
+                String desc  = getString(article, "description");
+                String url   = getString(article, "url");
                 String image = getString(article, "urlToImage");
 
-                // Bỏ bài bị xoá hoặc thiếu URL
-                if (title.equals("[Removed]") || url.isEmpty() || url.equals("[Removed]")) {
-                    continue;
-                }
-
+                if (title.equals("[Removed]") || url.isEmpty() || url.equals("[Removed]")) continue;
                 list.add(new News(title, desc, url, image));
             }
 
@@ -66,33 +64,25 @@ public class StockNewsController extends HttpServlet {
             e.printStackTrace();
         }
 
-        // Luôn forward — dù list rỗng sẽ hiện empty-state
         request.setAttribute("newsList", list);
+        request.setAttribute("filterSymbol", filterSymbol); // để news.jsp biết đang filter gì
         request.getRequestDispatcher("news.jsp").forward(request, response);
     }
 
     private String getString(JsonObject obj, String key) {
-        if (!obj.has(key) || obj.get(key).isJsonNull()) {
-            return "";
-        }
+        if (!obj.has(key) || obj.get(key).isJsonNull()) return "";
         JsonElement el = obj.get(key);
         return el.isJsonPrimitive() ? el.getAsString() : "";
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        processRequest(request, response);
-    }
+            throws ServletException, IOException { processRequest(request, response); }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        processRequest(request, response);
-    }
+            throws ServletException, IOException { processRequest(request, response); }
 
     @Override
-    public String getServletInfo() {
-        return "Stock News Controller";
-    }
+    public String getServletInfo() { return "Stock News Controller"; }
 }
