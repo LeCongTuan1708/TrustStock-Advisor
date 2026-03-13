@@ -8,6 +8,13 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+/**
+ * Front Controller (MVC) — single entry for most actions.
+ * <p>
+ * Maps {@code action} to the next servlet or JSP and forwards.
+ * No business logic here; see {@code com.investorcare.dao} and model package.
+ * </p>
+ */
 @WebServlet(name = "MainController", urlPatterns = {"/MainController"})
 public class MainController extends HttpServlet {
 
@@ -42,31 +49,23 @@ public class MainController extends HttpServlet {
     private static final String PORTFOLIO_CONTROLLER = "PortfolioController";
     private static final String USER_DASHBOARD = "dashboard";
     private static final String USER_DASHBOARD_CONTROLLER = "DashBoardController";
-
     private static final String LOGOUT_Controller = "logoutController";
-
     private static final String EDIT_WATCHLIST = "edit-watchlist";
     private static final String EDIT_WATCHLIST_CONTROLLER = "EditWatchListController";
     private static final String SHOW_EDIT_WATCHLIST = "show-edit-watchlist";
-
     private static final String SHOW_ADD_WATCHLIST = "show-add-watchlist";
     private static final String ADD_WATCHLIST_CONTROLLER = "AddWatchListController";
     private static final String ADD_WATCHLIST = "add-watchlist";
-
     private final static String WATCHLIST_ITEM = "watchlist-item";
     private static final String WATCHLIST_ITEM_CONTROLLER = "WatchListItemController";
-
     private static final String SHOW_ADD_ITEM = "show-add-item";
     private static final String SHOW_ADD_ITEM_CONTROLLER = "ShowAddWatchListItemController";
     private static final String ADD_ITEM = "add-item";
     private static final String ADD_ITEM_CONTROLLER = "AddWatchListItemController";
-
     private static final String REMOVE_ITEM = "remove-item";
     private static final String REMOVE_ITEM_CONTROLLER = "RemoveWatchListItemController";
-
     private static final String REMOVE_WATCHLIST = "remove-watchlist";
     private static final String REMOVE_WATCHLIST_CONTROLLER = "RemoveWatchListController";
-
     private static final String CARE_NOTE_LIST = "care-note-list";
     private static final String CARE_NOTE_LIST_CONTROLLER = "CareNoteListController";
 
@@ -98,6 +97,8 @@ public class MainController extends HttpServlet {
     
     private static final String UPDATE_ALERT = "update-alert";
     private static final String UPDATE_ALERT_CONTROLLER = "UpdateAlertController";
+    private static final String NEWS = "news";
+    private static final String NEWS_CONTROLLER = "StockNewsController";
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
@@ -140,8 +141,9 @@ public class MainController extends HttpServlet {
                 url = ADD_WATCHLIST_CONTROLLER;
             } else if (SHOW_ADD_WATCHLIST.equals(action)) {
                 url = "addWatchList.jsp";
-            } else if (USER_DASHBOARD.equals(action)) {
-                url = "userDashboard.jsp";
+            // Note: dashboard must go through DashBoardController so request
+            // attributes (assets, quotes, portfolios) are set — do not forward
+            // to userDashboard.jsp directly here (would break MVC and show empty data).
             } else if (WATCHLIST_ITEM.equals(action)) {
                 url = WATCHLIST_ITEM_CONTROLLER;
             } else if (SHOW_ADD_ITEM.equals(action)) {
@@ -182,12 +184,20 @@ public class MainController extends HttpServlet {
                 url = SHOW_EDIT_ALERT_CONTROLLER;
             } else if (UPDATE_ALERT.equals(action)) {
                 url = UPDATE_ALERT_CONTROLLER;
+            }else if(NEWS.equals(action)){
+                url = NEWS_CONTROLLER;
+                
             }else {
                 request.setAttribute("ERROR", "Your action not support");
             }
             }catch (Exception e) {
             log("Error at MainController: " + e.toString());
-        }finally {
+        } finally {
+            // Context-relative path: JSPs in webapp root often work without
+            // leading slash; servlets must use path as mapped (e.g. /loginController).
+            if (url != null && !url.endsWith(".jsp") && !url.startsWith("/")) {
+                url = "/" + url;
+            }
             request.getRequestDispatcher(url).forward(request, response);
         }
         }

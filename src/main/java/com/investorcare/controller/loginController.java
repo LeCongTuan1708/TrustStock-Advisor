@@ -1,13 +1,8 @@
 package com.investorcare.controller;
 
-import com.investorcare.dao.AssetDAO;
 import com.investorcare.dao.UserDAO;
-import com.investorcare.model.Asset;
 import com.investorcare.model.User;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -15,10 +10,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+/**
+ * MVC Controller — authentication only.
+ * On success redirects (POST-redirect pattern); on failure forwards to view with ERROR attribute.
+ */
 @WebServlet(name = "loginController", urlPatterns = {"/loginController"})
 public class loginController extends HttpServlet {
 
-    // Gom đủ 3 link xịn qua MainController
+    // Redirect targets via MainController (front controller pattern)
     private final static String USER_MANAGEMENT = "MainController?action=user-list";
     private final static String TICKER_MANAGEMENT = "MainController?action=asset-search";
     private final static String USER_DASHBOARD = "MainController?action=dashboard";
