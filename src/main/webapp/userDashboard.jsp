@@ -31,6 +31,12 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>TrustStock — Dashboard</title>
         <link rel="stylesheet" href="style_dashboard.css">
+        <%-- Prevent double submit on forms that POST to MainController --%>
+        <script src="js/form-loading.js" defer></script>
+        <style>button.is-loading{
+                opacity:.7;
+                pointer-events:none
+            }</style>
     </head>
     <body>
 
@@ -53,6 +59,9 @@
             <a href="#market"    class="tab-link"><span class="icon">📊</span> Market</a>
             <a href="#portfolio" class="tab-link"><span class="icon">💼</span> Portfolio</a>
             <a href="#watchlist" class="tab-link"><span class="icon">👁️</span> WatchList</a>
+            <a href="MainController?action=news" class="tab-link">
+                <span class="icon">📰</span> News
+            </a>
             <a href="#alerts"    class="tab-link">
                 <span class="icon">🔔</span> Alerts
                 <% if (unreadCount > 0) {%><span class="badge-count"><%= unreadCount%> new</span><% }%>
@@ -144,10 +153,10 @@
                                             <select name="portfolioId" class="input-dark" required>
                                                 <option value="">-- Select --</option>
                                                 <% if (portfolios != null) {
-                                                    for (Portfolio pOpt : portfolios) {%>
+                                                        for (Portfolio pOpt : portfolios) {%>
                                                 <option value="<%= pOpt.getPortfolioId()%>"><%= pOpt.getName()%></option>
                                                 <% }
-                                                } %>
+                                                    } %>
                                             </select>
                                             <input type="number" name="qty"     step="0.0001" placeholder="Qty"  class="input-dark sm" required>
                                             <input type="number" name="avgCost" step="0.01"   placeholder="Cost" class="input-dark sm" required>
@@ -157,7 +166,7 @@
                                 </td>
                             </tr>
                             <% }
-                            } %>
+                                } %>
                         </tbody>
                     </table>
                 </div>
@@ -176,7 +185,7 @@
                 </div>
                 <div class="portfolio-list">
                     <% if (portfolios != null && !portfolios.isEmpty()) {
-                        for (Portfolio p : portfolios) {%>
+                            for (Portfolio p : portfolios) {%>
                     <div class="portfolio-card" id="portfolio-card-<%= p.getPortfolioId()%>">
                         <input type="checkbox" id="rename-toggle-<%= p.getPortfolioId()%>" class="rename-toggle">
                         <div class="portfolio-main">
@@ -236,7 +245,7 @@
                         </thead>
                         <tbody>
                             <% for (PortfolioHolding h : holdings) {
-                                boolean isProfit = h.getPnl() >= 0;%>
+                                    boolean isProfit = h.getPnl() >= 0;%>
                             <tr>
                                 <td><span class="ticker-tag"><%= h.getSymbol()%></span></td>
                                 <td class="muted"><%= h.getName()%></td>
@@ -290,9 +299,9 @@
 
                         <div class="watchlist-card"
                              style="background: #111d30; border: 1px solid #1e3050; border-radius: 12px; padding: 18px; cursor: pointer; display: flex; align-items: center; gap: 16px; transition: all 0.25s ease;"
-                             onclick="window.location.href='MainController?action=watchlist-item&selectedId=${wl.watchListId}'"
-                             onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,.4)'; this.style.borderColor='${wlColor}';"
-                             onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'; this.style.borderColor='#1e3050';">
+                             onclick="window.location.href = 'MainController?action=watchlist-item&selectedId=${wl.watchListId}'"
+                             onmouseover="this.style.transform = 'translateY(-3px)'; this.style.boxShadow = '0 8px 24px rgba(0,0,0,.4)'; this.style.borderColor = '${wlColor}';"
+                             onmouseout="this.style.transform = 'translateY(0)'; this.style.boxShadow = 'none'; this.style.borderColor = '#1e3050';">
 
                             <div style="width: 48px; height: 48px; min-width: 48px; border-radius: 12px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center; font-size: 22px; color: ${wlColor};">
                                 📂
@@ -308,8 +317,8 @@
                             </div>
 
                             <div style="color: #3d5270; font-size: 16px; font-weight: bold; transition: color 0.2s;"
-                                 onmouseover="this.style.color='${wlColor}'"
-                                 onmouseout="this.style.color='#3d5270'">→</div>
+                                 onmouseover="this.style.color = '${wlColor}'"
+                                 onmouseout="this.style.color = '#3d5270'">→</div>
                         </div>
                     </c:forEach>
 
@@ -335,26 +344,26 @@
                 </div>
                 <div class="alert-list">
                     <% if (alerts != null && !alerts.isEmpty()) {
-                        for (Alert a : alerts) {
-                            String sev = "HIGH".equalsIgnoreCase(a.getSeverity()) ? "danger"
-                                    : "MEDIUM".equalsIgnoreCase(a.getSeverity()) ? "warn" : "success";
-                            String icon = "HIGH".equalsIgnoreCase(a.getSeverity()) ? "📉"
-                                    : "MEDIUM".equalsIgnoreCase(a.getSeverity()) ? "⚠️" : "🔔";
+                            for (Alert a : alerts) {
+                                String sev = "HIGH".equalsIgnoreCase(a.getSeverity()) ? "danger"
+                                        : "MEDIUM".equalsIgnoreCase(a.getSeverity()) ? "warn" : "success";
+                                String icon = "HIGH".equalsIgnoreCase(a.getSeverity()) ? "📉"
+                                        : "MEDIUM".equalsIgnoreCase(a.getSeverity()) ? "⚠️" : "🔔";
 
-                            String rawMsg = a.getMessage() != null ? a.getMessage() : "";
-                            String condDesc = "";
-                            String userMsg = rawMsg;
-                            if (rawMsg.startsWith("[CONDITION:")) {
-                                int end = rawMsg.indexOf("]");
-                                if (end > 0) {
-                                    String tag = rawMsg.substring(11, end);
-                                    String[] parts = tag.split(":");
-                                    if (parts.length == 2) {
-                                        condDesc = parts[0].replace("_", " ") + " " + parts[1];
+                                String rawMsg = a.getMessage() != null ? a.getMessage() : "";
+                                String condDesc = "";
+                                String userMsg = rawMsg;
+                                if (rawMsg.startsWith("[CONDITION:")) {
+                                    int end = rawMsg.indexOf("]");
+                                    if (end > 0) {
+                                        String tag = rawMsg.substring(11, end);
+                                        String[] parts = tag.split(":");
+                                        if (parts.length == 2) {
+                                            condDesc = parts[0].replace("_", " ") + " " + parts[1];
+                                        }
+                                        userMsg = rawMsg.substring(end + 1).trim();
                                     }
-                                    userMsg = rawMsg.substring(end + 1).trim();
                                 }
-                            }
                     %>
                     <div class="alert-item <%= sev%>">
                         <div class="alert-body">
@@ -412,9 +421,9 @@
 
                         <div class="note-card ${colorClass}"
                              style="background: #111d30; border: 1px solid #1e3050; border-radius: 12px; padding: 20px; cursor: pointer; position: relative; overflow: hidden; transition: transform .2s, box-shadow .2s;"
-                             onclick="window.location.href='MainController?action=show-edit-care-note&noteId=${note.noteId}'"
-                             onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,.4)';"
-                             onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+                             onclick="window.location.href = 'MainController?action=show-edit-care-note&noteId=${note.noteId}'"
+                             onmouseover="this.style.transform = 'translateY(-3px)'; this.style.boxShadow = '0 8px 24px rgba(0,0,0,.4)';"
+                             onmouseout="this.style.transform = 'translateY(0)'; this.style.boxShadow = 'none';">
 
                             <div style="position: absolute; top: 0; left: 0; right: 0; height: 3px;
                                  ${status.index % 5 == 0 ? 'background: linear-gradient(90deg, #00e5a0, #00bcd4);' :
@@ -464,9 +473,13 @@
                 }
                 document.querySelectorAll('.nav-tabs .tab-link').forEach(link => {
                     link.addEventListener('click', function (e) {
+                        const href = this.getAttribute('href');
+                        if (!href || !href.startsWith('#'))
+                            return; // link URL thật → cho điều hướng bình thường
                         e.preventDefault();
-                        const target = document.getElementById(this.getAttribute('href').replace('#', ''));
-                        if (!target) return;
+                        const target = document.getElementById(href.replace('#', ''));
+                        if (!target)
+                            return;
                         window.scrollTo({top: target.getBoundingClientRect().top + window.scrollY - getOffset(), behavior: 'smooth'});
                         document.querySelectorAll('.nav-tabs .tab-link').forEach(l => l.classList.remove('active'));
                         this.classList.add('active');
@@ -478,7 +491,8 @@
                     const offset = getOffset() + 16;
                     let current = sections[0];
                     for (const sec of sections) {
-                        if (sec.getBoundingClientRect().top <= offset) current = sec;
+                        if (sec.getBoundingClientRect().top <= offset)
+                            current = sec;
                     }
                     tabLinks.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#' + current.id));
                 }

@@ -17,7 +17,10 @@
         crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.min.js"
                 integrity="sha384-7VPbUDkoPSGFnVtYi0QogXtr74QeVeeIs99Qfg5YCF+TidwNdjvaKZX19NZ/e6oz"
-        crossorigin="anonymous"></script>
+                crossorigin="anonymous"></script>
+        <%-- Smooth submit: disable double post (MVC view-only script) --%>
+        <script src="js/form-loading.js" defer></script>
+        <style>button.is-loading{opacity:.7;pointer-events:none}</style>
     </head>
     <body>
         <%

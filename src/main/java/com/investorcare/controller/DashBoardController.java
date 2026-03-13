@@ -27,6 +27,11 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import service.StockAPIService;
 
+/**
+ * MVC Controller — user dashboard. Loads portfolios, assets, quotes (API), alerts, watchlists,
+ * care notes; sets request attributes for {@code userDashboard.jsp} only.
+ * Heavy work is synchronous; consider async or caching if page feels slow.
+ */
 @WebServlet(name = "DashBoardController", urlPatterns = {"/DashBoardController"})
 public class DashBoardController extends HttpServlet {
 
