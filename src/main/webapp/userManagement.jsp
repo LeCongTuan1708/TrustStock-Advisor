@@ -46,117 +46,106 @@
                     </div>
                 </nav>
 
-<<<<<<< HEAD
         <!-- CONTENT -->
-        <div class="container mt-4">
-            <!-- SEARCH + FILTER FORM-->
-            <form action="MainController" method="get">
-=======
-                <main class="px-md-4 py-4" style="margin-left: 280px; width: calc(100% - 280px);">
-                    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom border-secondary">
-                        <h1 class="h2 text-info fw-bold">User Management</h1>
-                    </div>
-
-                    <div class="card bg-dark border-secondary mb-4 shadow-sm">
-                        <div class="card-body">
-                            <form action="MainController" method="POST" class="row g-3">
-                                <input type="hidden" name="action" value="user-list">
-                                
-                                <%
-                                    String currentKeyword = (String) request.getAttribute("CURRENT_KEYWORD");
-                                    currentKeyword = (currentKeyword != null) ? currentKeyword : "";
-                                %>
-                                <div class="col-md-6">
-                                    <label class="form-label small fw-bold text-info">SEARCH USERS</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text bg-black border-secondary text-info"><i class="bi bi-search"></i></span>
-                                        <input type="search" name="keyword" class="form-control bg-black text-white border-secondary" 
-                                               placeholder="Search by username..." value="<%=currentKeyword%>">
-                                        <button class="btn btn-info text-dark fw-bold" type="submit">SEARCH</button>
-                                    </div>
-                                </div>
->>>>>>> main
-
-                                <div class="col-md-3">
-                                    <%
-                                        String currentRole = request.getParameter("role");
-                                        currentRole = (currentRole == null) ? "" : currentRole;
-                                    %>
-                                    
-                                    <label class="form-label small fw-bold text-info">ROLE</label>
-                                    <select name="role" class="form-select bg-black text-white border-secondary" onchange="this.form.submit()">
-                                        <option value="" <%= currentRole.equals("") ? "selected" : ""%>>All Roles</option>
-                                        <option value="Admin" <%= currentRole.equals("Admin") ? "selected" : ""%>>Admin</option>
-                                        <option value="User" <%= currentRole.equals("User") ? "selected" : ""%>>User</option>
-                                    </select>
-                                </div>
-
-                                <div class="col-md-3">
-                                    <%
-                                        String currentStatus = request.getParameter("status");
-                                        currentStatus = (currentStatus == null) ? "" : currentStatus;
-                                    %>
-                                    <label class="form-label small fw-bold text-info">STATUS</label>
-                                    <select name="status" class="form-select bg-black text-white border-secondary" onchange="this.form.submit()">
-                                        <option value="" <%=currentStatus.equals("") ? "selected" : "" %>>All Status</option>
-                                        <option value="Active" <%=currentStatus.equals("Active") ? "selected" : "" %>>Active</option>
-                                        <option value="Inactive" <%=currentStatus.equals("Inactive") ? "selected" : "" %>>Inactive</option>
-                                    </select>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-
-                    <div class="card border-secondary bg-dark shadow-sm">
-                        <div class="table-responsive">
-                            <table class="table table-dark table-hover align-middle mb-0">
-                                <thead class="table-active text-info border-bottom border-secondary">
-                                    <tr>
-                                        <th class="ps-2 py-3">ID</th>
-                                        <th class="ps-2 py-3">USERNAME</th>
-                                        <th class="ps-2 py-3">ROLE</th>
-                                        <th class="ps-2 py-3">STATUS</th>
-                                        <th class="ps-2 py-3">CREATED AT</th>
-                                        <th class="ps-2 py-3 text-center">INFO</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <%
-                                        List<User> listUser = (List<User>) request.getAttribute("LIST_USER");
-                                        if (listUser != null) {
-                                            for (User user : listUser) {
-                                    %>
-                                    <tr class="border-bottom border-secondary-subtle">
-                                        <td class="ps-2 text-secondary small align-middle">#<%=user.getUserId()%></td>
-                                        <td class="fw-bold align-middle"><%=user.getUsername()%></td>
-                                        <td class="align-middle">
-                                            <span class="badge text-dark fw-bold bg-primary"><%=user.getRole()%></span>
-                                        </td>
-                                        <td class="align-middle">
-                                            <span class="badge rounded-pill <%= user.getStatus().equals("Active") ? "bg-success" : "bg-danger" %>">
-                                                <%=user.getStatus()%>
-                                            </span>
-                                        </td>
-                                        <td class="text-light small align-middle"><%=user.getLastLogin()%></td>
-                                        <td class="text-center align-middle">
-                                            <a href="MainController?action=edit-user&userId=<%=user.getUserId()%>" 
-                                               class="btn btn-outline-info rounded-circle d-inline-flex align-items-center justify-content-center p-0 shadow-sm"
-                                               style="width: 20px; height: 20px;">
-                                                <i class="bi bi-info-lg"></i>
-                                            </a>
-                                        </td>
-                                    </tr>
-                                    <%
-                                            }
-                                        }
-                                    %>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </main>
+        <main class="px-md-4 py-4" style="margin-left: 280px; width: calc(100% - 280px);">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom border-secondary">
+                <h1 class="h2 text-info fw-bold">User Management</h1>
             </div>
-        </div>
+
+            <div class="card bg-dark border-secondary mb-4 shadow-sm">
+                <div class="card-body">
+                    <form action="MainController" method="GET" class="row g-3">
+                        <input type="hidden" name="action" value="user-list">
+                        
+                        <%
+                            String currentKeyword = (String) request.getAttribute("CURRENT_KEYWORD");
+                            currentKeyword = (currentKeyword != null) ? currentKeyword : "";
+                        %>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-info">SEARCH USERS</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-black border-secondary text-info"><i class="bi bi-search"></i></span>
+                                <input type="search" name="keyword" class="form-control bg-black text-white border-secondary" 
+                                       placeholder="Search by username..." value="<%=currentKeyword%>">
+                                <button class="btn btn-info text-dark fw-bold" type="submit">SEARCH</button>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <%
+                                String currentRole = request.getParameter("role");
+                                currentRole = (currentRole == null) ? "" : currentRole;
+                            %>
+                            <label class="form-label small fw-bold text-info">ROLE</label>
+                            <select name="role" class="form-select bg-black text-white border-secondary" onchange="this.form.submit()">
+                                <option value="" <%= currentRole.equals("") ? "selected" : ""%>>All Roles</option>
+                                <option value="Admin" <%= currentRole.equals("Admin") ? "selected" : ""%>>Admin</option>
+                                <option value="User" <%= currentRole.equals("User") ? "selected" : ""%>>User</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-3">
+                            <%
+                                String currentStatus = request.getParameter("status");
+                                currentStatus = (currentStatus == null) ? "" : currentStatus;
+                            %>
+                            <label class="form-label small fw-bold text-info">STATUS</label>
+                            <select name="status" class="form-select bg-black text-white border-secondary" onchange="this.form.submit()">
+                                <option value="" <%=currentStatus.equals("") ? "selected" : "" %>>All Status</option>
+                                <option value="Active" <%=currentStatus.equals("Active") ? "selected" : "" %>>Active</option>
+                                <option value="Inactive" <%=currentStatus.equals("Inactive") ? "selected" : "" %>>Inactive</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card border-secondary bg-dark shadow-sm">
+                <div class="table-responsive">
+                    <table class="table table-dark table-hover align-middle mb-0">
+                        <thead class="table-active text-info border-bottom border-secondary">
+                            <tr>
+                                <th class="ps-3 py-3">ID</th>
+                                <th class="py-3">USERNAME</th>
+                                <th class="py-3">ROLE</th>
+                                <th class="py-3">STATUS</th>
+                                <th class="py-3">LAST LOGIN</th> <th class="text-center py-3">INFO</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <%
+                                List<User> listUser = (List<User>) request.getAttribute("LIST_USER");
+                                if (listUser != null) {
+                                    for (User user : listUser) {
+                            %>
+                            <tr class="border-bottom border-secondary-subtle">
+                                <td class="ps-3 text-secondary small">#<%=user.getUserId()%></td>
+                                <td class="fw-bold"><%=user.getUsername()%></td>
+                                <td>
+                                    <span class="badge text-dark fw-bold bg-primary"><%=user.getRole()%></span>
+                                </td>
+                                <td>
+                                    <span class="badge rounded-pill <%= user.getStatus().equals("Active") ? "bg-success" : "bg-danger" %>">
+                                        <%=user.getStatus()%>
+                                    </span>
+                                </td>
+                                <td class="text-light small"><%=user.getLastLogin()%></td>
+                                <td class="text-center">
+                                    <a href="MainController?action=edit-user&userId=<%=user.getUserId()%>" 
+                                       class="btn btn-outline-info rounded-circle d-inline-flex align-items-center justify-content-center p-0 shadow-sm"
+                                       style="width: 28px; height: 28px;"> <i class="bi bi-info-lg"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            <%
+                                    }
+                                }
+                            %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     </body>
 </html>
