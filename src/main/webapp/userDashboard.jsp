@@ -8,8 +8,11 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%
-User acc = (User) session.getAttribute("LOGIN_USER");
-    if (acc == null) { response.sendRedirect("login.jsp"); return; }
+    User acc = (User) session.getAttribute("LOGIN_USER");
+    if (acc == null) {
+        response.sendRedirect("login.jsp");
+        return;
+    }
 
     List<Portfolio> portfolios = (List<Portfolio>) request.getAttribute("portfolios");
     List<Asset> assets = (List<Asset>) request.getAttribute("assets");
@@ -28,69 +31,45 @@ User acc = (User) session.getAttribute("LOGIN_USER");
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>TrustStock — Dashboard</title>
         <link rel="stylesheet" href="style_dashboard.css">
-        <%-- Prevent double submit on forms that POST to MainController --%>
         <script src="js/form-loading.js" defer></script>
         <style>button.is-loading{
-                opacity:.7;
-                pointer-events:none
-            }</style>
+            opacity:.7;
+            pointer-events:none
+        }</style>
     </head>
     <body>
 
-<!-- ===== NAVBAR ===== -->
-<nav class="navbar">
-    <div class="navbar-brand">
-        <div class="navbar-brand-icon">📈</div>
-        InvestorCare
-    </div>
-    <div class="navbar-right">
-        <span class="navbar-greeting">Welcome, <strong><%= acc.getUsername()%></strong></span>
-        <div class="navbar-avatar"><%= acc.getUsername().substring(0,1).toUpperCase()%></div>
-        <a href="MainController?action=logout" class="navbar-logout">Log out</a>
-    </div>
-</nav>
+        <!-- ===== NAVBAR ===== -->
+        <nav class="navbar">
+            <div class="navbar-brand">
+                <div class="navbar-brand-icon">📈</div>
+                InvestorCare
+            </div>
+            <div class="navbar-right">
+                <span class="navbar-greeting">Welcome, <strong><%= acc.getUsername()%></strong></span>
+                <a href="MainController?action=editProfile" class="navbar-avatar" title="View & Edit Profile">
+                    <%= acc.getUsername().substring(0, 1).toUpperCase()%>
+                </a>
+                <a href="MainController?action=logout" class="navbar-logout">Log out</a>
+            </div>
+        </nav>
 
-<!-- ===== NAV TABS ===== -->
-<div class="nav-tabs">
-    <a href="#account"   class="tab-link active"><span class="icon">👤</span> Account</a>
-    <a href="#market"    class="tab-link"><span class="icon">📊</span> Market</a>
-    <a href="#portfolio" class="tab-link"><span class="icon">💼</span> Portfolio</a>
-    <a href="#watchlist" class="tab-link"><span class="icon">👁️</span> WatchList</a>
-    <a href="MainController?action=news" class="tab-link">
-                <span class="icon">📰</span> News
+        <!-- ===== NAV TABS ===== -->
+        <div class="nav-tabs">
+            <a href="#market"    class="tab-link active"><span class="icon">📊</span> Market</a>
+            <a href="#chart"     class="tab-link"><span class="icon">📈</span> Chart</a>
+            <a href="#portfolio" class="tab-link"><span class="icon">💼</span> Portfolio</a>
+            <a href="#watchlist" class="tab-link"><span class="icon">👁️</span> WatchList</a>
+            <a href="MainController?action=news" class="tab-link"><span class="icon">📰</span> News</a>
+            <a href="#alerts" class="tab-link">
+                <span class="icon">🔔</span> Alerts
+                <% if (unreadCount > 0) {%><span class="badge-count"><%= unreadCount%> new</span><% } %>
             </a>
-    <a href="#alerts"    class="tab-link">
-        <span class="icon">🔔</span> Alerts
-        <% if (unreadCount > 0) { %><span class="badge-count"><%= unreadCount %> new</span><% } %>
-    </a>
-    <a href="#carenote"  class="tab-link"><span class="icon">📝</span> Care Note</a>
-</div>
-
-<!-- ===== CONTENT ===== -->
-<div class="content">
-
-    <!-- ACCOUNT -->
-    <section id="account" class="section-card">
-        <div class="section-header">
-            <div class="section-title"><span class="icon">👤</span> Account</div>
-            <form action="MainController" method="GET">
-                <button type="submit" name="action" value="editProfile" class="btn btn-light">✏️ Edit Profile</button>
-            </form>
+            <a href="#carenote" class="tab-link"><span class="icon">📝</span> Care Note</a>
         </div>
-        <div class="account-info">
-            <div class="account-avatar"><%= acc.getUsername().substring(0,1).toUpperCase()%></div>
-            <div>
-                <div class="account-name"><%= acc.getUsername()%></div>
-                <div style="margin-top:6px;"><span class="badge badge-green">● Active</span></div>
-            </div>
-        </div>
-        <div class="account-stats">
-            <div class="stat-box"><div class="stat-label">Member Since</div><div class="stat-value"><%= (acc.getCreated_at()!= null) ? acc.getCreated_at().substring(0, 10) : "N/A" %></div>
-            </div>
-            <div class="stat-box"><div class="stat-label">Last Login</div><div class="stat-value"><%= (acc.getLastLogin() != null) ? acc.getLastLogin() : "N/A" %></div></div>
-        </div>
-    </section>
 
+        <!-- ===== CONTENT ===== -->
+        <div class="content">
 
             <!-- MARKET -->
             <section id="market" class="section-card">
@@ -131,9 +110,7 @@ User acc = (User) session.getAttribute("LOGIN_USER");
                                 </td>
                                 <td class="muted"><%= a.getName()%></td>
                                 <td><span class="exchange-tag"><%= a.getExchange()%></span></td>
-                                <td class="right">
-                                    <span class="price-cell"><%= q != null && q.getCurrentPrice() > 0 ? String.format("$%.2f", q.getCurrentPrice()) : "N/A"%></span>
-                                </td>
+                                <td class="right"><span class="price-cell"><%= q != null && q.getCurrentPrice() > 0 ? String.format("$%.2f", q.getCurrentPrice()) : "N/A"%></span></td>
                                 <td class="right">
                                     <% if (q != null && q.getCurrentPrice() > 0) {%>
                                     <span class="<%= cls%>"><%= arrow%> $<%= String.format("%.2f", Math.abs(q.getChange()))%></span>
@@ -158,10 +135,10 @@ User acc = (User) session.getAttribute("LOGIN_USER");
                                             <select name="portfolioId" class="input-dark" required>
                                                 <option value="">-- Select --</option>
                                                 <% if (portfolios != null) {
-                                                        for (Portfolio pOpt : portfolios) {%>
+                                                for (Portfolio pOpt : portfolios) {%>
                                                 <option value="<%= pOpt.getPortfolioId()%>"><%= pOpt.getName()%></option>
                                                 <% }
-                                                    } %>
+                                            } %>
                                             </select>
                                             <input type="number" name="qty"     step="0.0001" placeholder="Qty"  class="input-dark sm" required>
                                             <input type="number" name="avgCost" step="0.01"   placeholder="Cost" class="input-dark sm" required>
@@ -171,9 +148,52 @@ User acc = (User) session.getAttribute("LOGIN_USER");
                                 </td>
                             </tr>
                             <% }
-                                } %>
+                        } %>
                         </tbody>
                     </table>
+                </div>
+            </section>
+
+            <!-- ===== CHART SECTION ===== -->
+            <section id="chart" class="section-card">
+                <div class="section-header">
+                    <div class="section-title"><span class="icon">📈</span> Price Chart</div>
+                    <div class="chart-symbol-pills" id="chartSymbolPills"></div>
+                </div>
+
+                <div class="chart-toolbar">
+                    <div class="chart-search-wrap">
+                        <span class="chart-search-icon">🔍</span>
+                        <input type="text" id="chartSymbolInput" class="chart-search-input"
+                               placeholder="e.g. NASDAQ:AAPL" value="">
+                    </div>
+                    <select id="chartIntervalSelect" class="chart-select">
+                        <option value="1">1 min</option>
+                        <option value="5">5 min</option>
+                        <option value="15">15 min</option>
+                        <option value="60">1 hour</option>
+                        <option value="D" selected>1 day</option>
+                        <option value="W">1 week</option>
+                        <option value="M">1 month</option>
+                    </select>
+                    <select id="chartStyleSelect" class="chart-select">
+                        <option value="1" selected>Candlestick</option>
+                        <option value="0">Bars</option>
+                        <option value="2">Line</option>
+                        <option value="3">Area</option>
+                        <option value="8">Heikin Ashi</option>
+                    </select>
+                    <button class="btn btn-dark btn-sm" onclick="loadChart()">Apply</button>
+                </div>
+
+                <!-- Container cố định height, KHÔNG dùng autosize -->
+                <div class="tv-chart-container">
+                    <div id="tradingview_chart"></div>
+                </div>
+
+                <div class="mini-chart-section">
+                    <div class="mini-chart-header">Quick Overview</div>
+                    <div class="mini-charts-grid" id="miniChartsGrid"></div>
                 </div>
             </section>
 
@@ -190,7 +210,7 @@ User acc = (User) session.getAttribute("LOGIN_USER");
                 </div>
                 <div class="portfolio-list">
                     <% if (portfolios != null && !portfolios.isEmpty()) {
-                            for (Portfolio p : portfolios) {%>
+                    for (Portfolio p : portfolios) {%>
                     <div class="portfolio-card" id="portfolio-card-<%= p.getPortfolioId()%>">
                         <input type="checkbox" id="rename-toggle-<%= p.getPortfolioId()%>" class="rename-toggle">
                         <div class="portfolio-main">
@@ -219,10 +239,8 @@ User acc = (User) session.getAttribute("LOGIN_USER");
                         </form>
                     </div>
                     <% }
-                    } else { %>
-                    <p style="color:var(--text-muted);font-size:13px;text-align:center;padding:24px 0;">
-                        No portfolios yet. Create one to get started!
-                    </p>
+            } else { %>
+                    <p style="color:var(--text-muted);font-size:13px;text-align:center;padding:24px 0;">No portfolios yet. Create one to get started!</p>
                     <% } %>
                 </div>
             </section>
@@ -250,7 +268,7 @@ User acc = (User) session.getAttribute("LOGIN_USER");
                         </thead>
                         <tbody>
                             <% for (PortfolioHolding h : holdings) {
-                                    boolean isProfit = h.getPnl() >= 0;%>
+                            boolean isProfit = h.getPnl() >= 0;%>
                             <tr>
                                 <td><span class="ticker-tag"><%= h.getSymbol()%></span></td>
                                 <td class="muted"><%= h.getName()%></td>
@@ -287,52 +305,36 @@ User acc = (User) session.getAttribute("LOGIN_USER");
             <% } %>
 
             <!-- WATCHLIST -->
-            <section id="watchlist" class="section-card" style="background: transparent; border: none; padding: 0; margin-bottom: 24px;">
-                <div class="section-header" style="margin-bottom: 20px;">
+            <section id="watchlist" class="section-card" style="background:transparent;border:none;padding:0;margin-bottom:24px;">
+                <div class="section-header" style="margin-bottom:20px;">
                     <div class="section-title"><span class="icon">👁️</span> WatchList</div>
                     <a href="MainController?action=watch-list" class="btn btn-dark" style="text-decoration:none;">Manage WatchList</a>
                 </div>
-
-                <div class="watchlist-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px;">
+                <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;">
                     <c:forEach items="${watchLists}" var="wl" varStatus="status">
                         <c:choose>
-                            <c:when test="${status.index % 4 == 0}"><c:set var="wlColor" value="#00e5a0"/></c:when>
-                            <c:when test="${status.index % 4 == 1}"><c:set var="wlColor" value="#3b82f6"/></c:when>
-                            <c:when test="${status.index % 4 == 2}"><c:set var="wlColor" value="#a855f7"/></c:when>
+                            <c:when test="${status.index%4==0}"><c:set var="wlColor" value="#00e5a0"/></c:when>
+                            <c:when test="${status.index%4==1}"><c:set var="wlColor" value="#3b82f6"/></c:when>
+                            <c:when test="${status.index%4==2}"><c:set var="wlColor" value="#a855f7"/></c:when>
                             <c:otherwise><c:set var="wlColor" value="#f59e0b"/></c:otherwise>
                         </c:choose>
-
-                        <div class="watchlist-card"
-                             style="background: #111d30; border: 1px solid #1e3050; border-radius: 12px; padding: 18px; cursor: pointer; display: flex; align-items: center; gap: 16px; transition: all 0.25s ease;"
+                        <div style="background:#111d30;border:1px solid #1e3050;border-radius:12px;padding:18px;cursor:pointer;display:flex;align-items:center;gap:16px;transition:all .25s;"
                              onclick="window.location.href = 'MainController?action=watchlist-item&selectedId=${wl.watchListId}'"
-                             onmouseover="this.style.transform = 'translateY(-3px)'; this.style.boxShadow = '0 8px 24px rgba(0,0,0,.4)'; this.style.borderColor = '${wlColor}';"
-                             onmouseout="this.style.transform = 'translateY(0)'; this.style.boxShadow = 'none'; this.style.borderColor = '#1e3050';">
-
-                            <div style="width: 48px; height: 48px; min-width: 48px; border-radius: 12px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center; font-size: 22px; color: ${wlColor};">
-                                📂
+                             onmouseover="this.style.transform = 'translateY(-3px)';this.style.borderColor = '${wlColor}';"
+                             onmouseout="this.style.transform = 'translateY(0)';this.style.borderColor = '#1e3050';">
+                            <div style="width:48px;height:48px;min-width:48px;border-radius:12px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;font-size:22px;color:${wlColor};">📂</div>
+                            <div style="flex:1;overflow:hidden;">
+                                <div style="font-size:16px;font-weight:600;color:#e8f0fc;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${wl.name}</div>
+                                <div style="font-size:12px;color:#7a94b8;">🗓 ${wl.createAt}</div>
                             </div>
-
-                            <div style="flex: 1; overflow: hidden;">
-                                <div class="ticker-symbol" style="font-size: 16px; font-weight: 600; color: #e8f0fc; margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                    ${wl.name}
-                                </div>
-                                <div class="ticker-name" style="font-size: 12px; color: #7a94b8; display: flex; align-items: center; gap: 4px;">
-                                    <span>🗓</span> ${wl.createAt}
-                                </div>
-                            </div>
-
-                            <div style="color: #3d5270; font-size: 16px; font-weight: bold; transition: color 0.2s;"
-                                 onmouseover="this.style.color = '${wlColor}'"
-                                 onmouseout="this.style.color = '#3d5270'">→</div>
+                            <div style="color:#3d5270;font-size:16px;">→</div>
                         </div>
                     </c:forEach>
-
                     <c:if test="${empty watchLists}">
-                        <div style="padding: 40px 20px; color: #7a94b8; grid-column: 1 / -1; text-align: center; background: #111d30; border-radius: 12px; border: 1px dashed #1e3050;">
-                            <div style="font-size: 36px; margin-bottom: 12px; opacity: 0.5;">📁</div>
-                            <div style="font-size: 16px; font-weight: 600; margin-bottom: 8px; color: #e8f0fc;">Chưa có thư mục theo dõi</div>
-                            <p style="font-size: 13px; margin-bottom: 16px;">Tạo danh sách để dễ dàng theo dõi các mã cổ phiếu tiềm năng.</p>
-                            <a href="MainController?action=watch-list" class="btn btn-dark" style="text-decoration: none; padding: 8px 16px; font-size: 13px; border: 1px solid #1e3050; border-radius: 8px;">Thiết lập ngay</a>
+                        <div style="padding:40px;color:#7a94b8;grid-column:1/-1;text-align:center;background:#111d30;border-radius:12px;border:1px dashed #1e3050;">
+                            <div style="font-size:36px;margin-bottom:12px;opacity:.5;">📁</div>
+                            <div style="font-size:16px;font-weight:600;color:#e8f0fc;margin-bottom:16px;">No watchlists yet</div>
+                            <a href="MainController?action=watch-list" class="btn btn-dark" style="text-decoration:none;">Set up now</a>
                         </div>
                     </c:if>
                 </div>
@@ -350,19 +352,14 @@ User acc = (User) session.getAttribute("LOGIN_USER");
                 <div class="alert-list">
                     <% if (alerts != null && !alerts.isEmpty()) {
                             for (Alert a : alerts) {
-                                String sev = "HIGH".equalsIgnoreCase(a.getSeverity()) ? "danger"
-                                        : "MEDIUM".equalsIgnoreCase(a.getSeverity()) ? "warn" : "success";
-                                String icon = "HIGH".equalsIgnoreCase(a.getSeverity()) ? "📉"
-                                        : "MEDIUM".equalsIgnoreCase(a.getSeverity()) ? "⚠️" : "🔔";
-
+                                String sev = "HIGH".equalsIgnoreCase(a.getSeverity()) ? "danger" : "MEDIUM".equalsIgnoreCase(a.getSeverity()) ? "warn" : "success";
+                                String icon = "HIGH".equalsIgnoreCase(a.getSeverity()) ? "📉" : "MEDIUM".equalsIgnoreCase(a.getSeverity()) ? "⚠️" : "🔔";
                                 String rawMsg = a.getMessage() != null ? a.getMessage() : "";
-                                String condDesc = "";
-                                String userMsg = rawMsg;
+                                String condDesc = "", userMsg = rawMsg;
                                 if (rawMsg.startsWith("[CONDITION:")) {
                                     int end = rawMsg.indexOf("]");
                                     if (end > 0) {
-                                        String tag = rawMsg.substring(11, end);
-                                        String[] parts = tag.split(":");
+                                        String[] parts = rawMsg.substring(11, end).split(":");
                                         if (parts.length == 2) {
                                             condDesc = parts[0].replace("_", " ") + " " + parts[1];
                                         }
@@ -376,11 +373,7 @@ User acc = (User) session.getAttribute("LOGIN_USER");
                             <div>
                                 <div class="alert-title"><%= userMsg.isEmpty() ? "(No message)" : userMsg%></div>
                                 <div class="alert-desc" style="display:flex;gap:12px;margin-top:3px;">
-                                    <% if (!condDesc.isEmpty()) {%>
-                                    <span style="background:var(--bg-hover);padding:1px 8px;border-radius:4px;font-size:11px;">
-                                        📌 <%= condDesc%>
-                                    </span>
-                                    <% }%>
+                                    <% if (!condDesc.isEmpty()) {%><span style="background:var(--bg-hover);padding:1px 8px;border-radius:4px;font-size:11px;">📌 <%= condDesc%></span><% }%>
                                     <span>Status: <strong style="color:var(--text-primary)"><%= a.getStatus()%></strong></span>
                                     <span>Severity: <strong style="color:var(--text-primary)"><%= a.getSeverity()%></strong></span>
                                 </div>
@@ -388,99 +381,62 @@ User acc = (User) session.getAttribute("LOGIN_USER");
                         </div>
                         <div class="alert-meta">
                             <span class="alert-time"><%= a.getTimestamp()%></span>
-                            <a href="MainController?action=show-view-alert&alertId=<%= a.getAlertId()%>" class="btn btn-light btn-sm" title="View Alert">👁️</a>
-                            <a href="MainController?action=show-edit-alert&alertId=<%= a.getAlertId()%>" class="btn btn-outline btn-sm" title="Edit Alert">✏️</a>
+                            <a href="MainController?action=show-view-alert&alertId=<%= a.getAlertId()%>" class="btn btn-light btn-sm">👁️</a>
+                            <a href="MainController?action=show-edit-alert&alertId=<%= a.getAlertId()%>" class="btn btn-outline btn-sm">✏️</a>
                             <form action="MainController" method="POST" style="display:inline">
                                 <input type="hidden" name="action" value="delete-alert">
                                 <input type="hidden" name="alertId" value="<%= a.getAlertId()%>">
-                                <button type="submit" class="btn btn-danger btn-sm"
-                                        onclick="return confirm('Delete this alert?')">🗑</button>
+                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Delete this alert?')">🗑</button>
                             </form>
                         </div>
                     </div>
                     <% }
-                    } else { %>
-                    <p style="color:var(--text-muted);font-size:13px;text-align:center;padding:24px 0;">
-                        No alerts yet. Create one to get notified!
-                    </p>
+            } else { %>
+                    <p style="color:var(--text-muted);font-size:13px;text-align:center;padding:24px 0;">No alerts yet.</p>
                     <% }%>
                 </div>
             </section>
 
             <!-- CARE NOTE -->
-            <section id="carenote" class="section-card" style="background: transparent; border: none; padding: 0;">
-                <div class="section-header" style="margin-bottom: 20px;">
+            <section id="carenote" class="section-card" style="background:transparent;border:none;padding:0;">
+                <div class="section-header" style="margin-bottom:20px;">
                     <div class="section-title"><span class="icon">📝</span> Care Note</div>
                     <a href="MainController?action=care-note-list" class="btn btn-dark" style="text-decoration:none;">Manage Care Note</a>
                 </div>
-
-                <div class="note-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px;">
+                <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;">
                     <c:forEach items="${careNotes}" var="note" varStatus="status">
-                        <c:choose>
-                            <c:when test="${status.index % 5 == 0}"><c:set var="colorClass" value="color-teal"/></c:when>
-                            <c:when test="${status.index % 5 == 1}"><c:set var="colorClass" value="color-blue"/></c:when>
-                            <c:when test="${status.index % 5 == 2}"><c:set var="colorClass" value="color-amber"/></c:when>
-                            <c:when test="${status.index % 5 == 3}"><c:set var="colorClass" value="color-purple"/></c:when>
-                            <c:otherwise><c:set var="colorClass" value="color-rose"/></c:otherwise>
-                        </c:choose>
-
-                        <div class="note-card ${colorClass}"
-                             style="background: #111d30; border: 1px solid #1e3050; border-radius: 12px; padding: 20px; cursor: pointer; position: relative; overflow: hidden; transition: transform .2s, box-shadow .2s;"
+                        <div style="background:#111d30;border:1px solid #1e3050;border-radius:12px;padding:20px;cursor:pointer;position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s;"
                              onclick="window.location.href = 'MainController?action=show-edit-care-note&noteId=${note.noteId}'"
-                             onmouseover="this.style.transform = 'translateY(-3px)'; this.style.boxShadow = '0 8px 24px rgba(0,0,0,.4)';"
-                             onmouseout="this.style.transform = 'translateY(0)'; this.style.boxShadow = 'none';">
-
-                            <div style="position: absolute; top: 0; left: 0; right: 0; height: 3px;
-                                 ${status.index % 5 == 0 ? 'background: linear-gradient(90deg, #00e5a0, #00bcd4);' :
-                                   status.index % 5 == 1 ? 'background: linear-gradient(90deg, #3b82f6, #6366f1);' :
-                                   status.index % 5 == 2 ? 'background: linear-gradient(90deg, #f59e0b, #ef4444);' :
-                                   status.index % 5 == 3 ? 'background: linear-gradient(90deg, #a855f7, #ec4899);' :
-                                   'background: linear-gradient(90deg, #f43f5e, #f97316);'}">
-                            </div>
-
-                            <div class="note-top" style="display: flex; justify-content: space-between; margin-bottom: 12px;">
-                                <span class="note-ticker" style="background: rgba(0,229,160,.1); border: 1px solid rgba(0,229,160,.25); color: #00e5a0; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 700;">
-                                    📌 ${note.asset.symbol != null ? note.asset.symbol : 'Ghi chú'}
-                                </span>
-                            </div>
-
-                            <div class="note-title" style="font-size: 15px; font-weight: 600; color: #e8f0fc; margin-bottom: 8px; line-height: 1.4;">
-                                ${note.title}
-                            </div>
-
-                            <div class="note-content" style="font-size: 13px; color: #7a94b8; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 14px;">
-                                ${note.content}
-                            </div>
-
-                            <div class="note-footer" style="padding-top: 12px; border-top: 1px solid #1e3050; font-size: 11px; color: #3d5270;">
-                                🗓 Cập nhật: ${note.updatedAt}
-                            </div>
+                             onmouseover="this.style.transform = 'translateY(-3px)';this.style.boxShadow = '0 8px 24px rgba(0,0,0,.4)';"
+                             onmouseout="this.style.transform = 'translateY(0)';this.style.boxShadow = 'none';">
+                            <div style="position:absolute;top:0;left:0;right:0;height:3px;${status.index%5==0?'background:linear-gradient(90deg,#00e5a0,#00bcd4);':status.index%5==1?'background:linear-gradient(90deg,#3b82f6,#6366f1);':status.index%5==2?'background:linear-gradient(90deg,#f59e0b,#ef4444);':status.index%5==3?'background:linear-gradient(90deg,#a855f7,#ec4899);':'background:linear-gradient(90deg,#f43f5e,#f97316);'}"></div>
+                            <div style="margin-bottom:12px;"><span style="background:rgba(0,229,160,.1);border:1px solid rgba(0,229,160,.25);color:#00e5a0;padding:3px 8px;border-radius:12px;font-size:11px;font-weight:700;">📌 ${note.asset.symbol!=null?note.asset.symbol:'Note'}</span></div>
+                            <div style="font-size:15px;font-weight:600;color:#e8f0fc;margin-bottom:8px;line-height:1.4;">${note.title}</div>
+                            <div style="font-size:13px;color:#7a94b8;line-height:1.5;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:14px;">${note.content}</div>
+                            <div style="padding-top:12px;border-top:1px solid #1e3050;font-size:11px;color:#3d5270;">🗓 Updated: ${note.updatedAt}</div>
                         </div>
                     </c:forEach>
-
                     <c:if test="${empty careNotes}">
-                        <div style="padding: 30px; color: #7a94b8; grid-column: 1 / -1; text-align: center; background: #111d30; border-radius: 12px; border: 1px dashed #1e3050;">
-                            Chưa có nhật ký nào. Bấm 'Manage Care Note' để bắt đầu ghi chép nhé!
-                        </div>
+                        <div style="padding:30px;color:#7a94b8;grid-column:1/-1;text-align:center;background:#111d30;border-radius:12px;border:1px dashed #1e3050;">No notes yet.</div>
                     </c:if>
                 </div>
             </section>
 
-        </div><!-- /.content -->
+        </div>
 
+        <!-- ===== SCROLL SPY ===== -->
         <script>
             (function () {
                 const navbar = document.querySelector('.navbar');
                 const navTabs = document.querySelector('.nav-tabs');
                 function getOffset() {
-                    return (navbar ? navbar.offsetHeight : 64)
-                            + (navTabs ? navTabs.offsetHeight : 48) + 8;
+                    return (navbar ? navbar.offsetHeight : 64) + (navTabs ? navTabs.offsetHeight : 48) + 8;
                 }
                 document.querySelectorAll('.nav-tabs .tab-link').forEach(link => {
                     link.addEventListener('click', function (e) {
                         const href = this.getAttribute('href');
                         if (!href || !href.startsWith('#'))
-                            return; // link URL thật → cho điều hướng bình thường
+                            return;
                         e.preventDefault();
                         const target = document.getElementById(href.replace('#', ''));
                         if (!target)
@@ -503,6 +459,229 @@ User acc = (User) session.getAttribute("LOGIN_USER");
                 }
                 window.addEventListener('scroll', onScroll, {passive: true});
                 onScroll();
+            })();
+        </script>
+
+        <!-- ===== TRADINGVIEW ===== -->
+        <%-- Inject DB assets as JS array --%>
+        <script>
+            var DB_SYMBOLS = [
+            <%
+        // Danh sách exchange hợp lệ mà TradingView nhận — ngoài danh sách này sẽ bị bỏ prefix
+            java.util.Set<String> VALID_TV_EXCHANGES = new java.util.HashSet<>(java.util.Arrays.asList(
+                    "NASDAQ", "NYSE", "AMEX", "NYSEARCA", "BATS", // US stocks
+                    "BINANCE", "BYBIT", "COINBASE", "KRAKEN", "OKX", // Crypto
+                    "HOSE", "HNX", "UPCOM", // Vietnam
+                    "TSX", "TSXV", // Canada
+                    "LSE", "XETRA", "EURONEXT", "AMS", "EPA", "ETR", // Europe
+                    "TYO", "HKEX", "SGX", "ASX", "BSE", "NSE", // Asia-Pacific
+                    "FX", "OANDA", "FXCM", "FOREXCOM", // Forex
+                    "COMEX", "NYMEX", "CME", "CBOT" // Futures
+            ));
+
+            if (assets != null && !assets.isEmpty()) {
+                for (int i = 0; i < assets.size(); i++) {
+                    Asset a = assets.get(i);
+                    String exchange = (a.getExchange() != null && !a.getExchange().trim().isEmpty())
+                            ? a.getExchange().trim().toUpperCase() : "";
+                    String sym = a.getSymbol().trim().toUpperCase();
+
+                    // Nếu symbol đã chứa ":" thì user tự format rồi, dùng nguyên
+                    String tvSymbol;
+                    if (sym.contains(":")) {
+                        tvSymbol = sym;
+                        // tách lại label cho gọn
+                        sym = sym.substring(sym.indexOf(':') + 1);
+                    } else if (exchange.equals("CRYPTO") || exchange.equals("BINANCE") || exchange.equals("BYBIT")) {
+                        exchange = "BINANCE";
+                        if (!sym.endsWith("USDT") && !sym.endsWith("BTC") && !sym.endsWith("ETH")) {
+                            sym = sym + "USDT";
+                        }
+                        tvSymbol = exchange + ":" + sym;
+                    } else if (VALID_TV_EXCHANGES.contains(exchange)) {
+                        // Exchange hợp lệ — dùng trực tiếp
+                        tvSymbol = exchange + ":" + sym;
+                    } else {
+                        // Exchange không hợp lệ (YAHOO, UNKNOWN, v.v.) — bỏ prefix, để TradingView tự tìm
+                        tvSymbol = sym;
+                    }
+
+                    String safeName = a.getName().replace("\\", "\\\\").replace("\"", "\\\"");
+            %>
+            { label: "<%= sym%>", full: "<%= tvSymbol%>", name: "<%= safeName%>" }<%= i < assets.size() - 1 ? "," : ""%>
+            <%
+            }
+        } else {
+            %>
+            { label: "AAPL", full: "NASDAQ:AAPL", name: "Apple Inc." }
+            ,
+            { label: "TSLA", full: "NASDAQ:TSLA", name: "Tesla" }
+            ,
+            { label: "BTC", full: "BINANCE:BTCUSDT", name: "Bitcoin" }
+            <%}%>
+            ];
+        </script>
+
+        <script>
+            (function () {
+                var currentSymbol = DB_SYMBOLS.length > 0 ? DB_SYMBOLS[0].full : 'NASDAQ:AAPL';
+
+                function renderPills() {
+                    var container = document.getElementById('chartSymbolPills');
+                    if (!container)
+                        return;
+                    container.innerHTML = '';
+                    DB_SYMBOLS.forEach(function (s) {
+                        var pill = document.createElement('span');
+                        pill.className = 'chart-pill' + (s.full === currentSymbol ? ' active' : '');
+                        pill.textContent = s.label;
+                        pill.title = s.name;
+                        pill.onclick = function () {
+                            currentSymbol = s.full;
+                            document.getElementById('chartSymbolInput').value = s.full;
+                            document.querySelectorAll('.chart-pill').forEach(function (p) {
+                                p.classList.remove('active');
+                            });
+                            pill.classList.add('active');
+                            loadChart();
+                        };
+                        container.appendChild(pill);
+                    });
+                    var inp = document.getElementById('chartSymbolInput');
+                    if (inp && !inp.value)
+                        inp.value = currentSymbol;
+                }
+
+                /* ── Danh sách exchange hợp lệ trên TradingView ── */
+                var VALID_EXCHANGES = {
+                    'NASDAQ': 1, 'NYSE': 1, 'AMEX': 1, 'NYSEARCA': 1, 'BATS': 1,
+                    'BINANCE': 1, 'BYBIT': 1, 'COINBASE': 1, 'KRAKEN': 1, 'OKX': 1,
+                    'HOSE': 1, 'HNX': 1, 'UPCOM': 1,
+                    'TSX': 1, 'TSXV': 1,
+                    'LSE': 1, 'XETRA': 1, 'EURONEXT': 1, 'AMS': 1, 'EPA': 1, 'ETR': 1,
+                    'TYO': 1, 'HKEX': 1, 'SGX': 1, 'ASX': 1, 'BSE': 1, 'NSE': 1,
+                    'FX': 1, 'OANDA': 1, 'FXCM': 1, 'FOREXCOM': 1,
+                    'COMEX': 1, 'NYMEX': 1, 'CME': 1, 'CBOT': 1
+                };
+
+                /* ── Làm sạch symbol nhập tay: bỏ exchange không hợp lệ ── */
+                function sanitizeSymbol(raw) {
+                    var s = raw.trim().toUpperCase();
+                    if (!s)
+                        return '';
+                    if (s.indexOf(':') === -1)
+                        return s;          // không có prefix → OK
+                    var parts = s.split(':');
+                    var exchange = parts[0].trim();
+                    var ticker = parts.slice(1).join(':').trim();
+                    if (VALID_EXCHANGES[exchange])
+                        return s;       // exchange hợp lệ → giữ nguyên
+                    return ticker;                                 // exchange không hợp lệ → bỏ prefix
+                }
+
+                window.loadChart = function () {
+                    var raw = (document.getElementById('chartSymbolInput').value || '').trim();
+                    var sym = sanitizeSymbol(raw) || currentSymbol;
+                    var interval = document.getElementById('chartIntervalSelect').value;
+                    var style = document.getElementById('chartStyleSelect').value;
+                    currentSymbol = sym;
+
+                    /* Cập nhật lại input để user thấy symbol đã được làm sạch */
+                    document.getElementById('chartSymbolInput').value = sym;
+
+                    /* Xoá widget cũ trước khi tạo mới */
+                    var holder = document.getElementById('tradingview_chart');
+                    holder.innerHTML = '';
+
+                    new TradingView.widget({
+                        autosize: false, /* BẮT BUỘC false để height cố định hoạt động */
+                        width: '100%',
+                        height: 560,
+                        symbol: currentSymbol,
+                        interval: interval,
+                        timezone: 'Asia/Ho_Chi_Minh',
+                        theme: 'dark',
+                        style: style,
+                        locale: 'en',
+                        toolbar_bg: '#0d1526',
+                        enable_publishing: false,
+                        hide_top_toolbar: false,
+                        hide_legend: false,
+                        save_image: true,
+                        container_id: 'tradingview_chart',
+                        studies: ['RSI@tv-basicstudies', 'MACD@tv-basicstudies'],
+                        show_popup_button: true,
+                        popup_width: '1000',
+                        popup_height: '650',
+                        withdateranges: true,
+                        allow_symbol_change: true,
+                        details: true,
+                        hotlist: true,
+                        calendar: false,
+                        overrides: {
+                            'mainSeriesProperties.candleStyle.upColor': '#00e5a0',
+                            'mainSeriesProperties.candleStyle.downColor': '#f43f5e',
+                            'mainSeriesProperties.candleStyle.borderUpColor': '#00e5a0',
+                            'mainSeriesProperties.candleStyle.borderDownColor': '#f43f5e',
+                            'mainSeriesProperties.candleStyle.wickUpColor': '#00e5a0',
+                            'mainSeriesProperties.candleStyle.wickDownColor': '#f43f5e',
+                        },
+                    });
+                };
+
+                function renderMiniCharts() {
+                    var grid = document.getElementById('miniChartsGrid');
+                    if (!grid)
+                        return;
+                    grid.innerHTML = '';
+                    DB_SYMBOLS.forEach(function (s) {
+                        var card = document.createElement('div');
+                        card.className = 'mini-chart-card';
+                        card.title = s.name + ' — click to open';
+                        card.onclick = function () {
+                            currentSymbol = s.full;
+                            document.getElementById('chartSymbolInput').value = s.full;
+                            renderPills();
+                            loadChart();
+                            document.getElementById('chart').scrollIntoView({behavior: 'smooth'});
+                        };
+                        var id = 'mini_' + s.label.replace(/[^a-zA-Z0-9]/g, '_');
+                        card.innerHTML = '<div id="' + id + '"></div>';
+                        grid.appendChild(card);
+
+                        new TradingView.MiniWidget({
+                            container_id: id,
+                            symbol: s.full,
+                            locale: 'en',
+                            dateRange: '3M',
+                            colorTheme: 'dark',
+                            trendLineColor: 'rgba(0,229,160,1)',
+                            underLineColor: 'rgba(0,229,160,.12)',
+                            underLineBottomColor: 'rgba(0,229,160,0)',
+                            isTransparent: true,
+                            autosize: true,
+                            width: '100%',
+                            height: 160,
+                            chartOnly: false,
+                            noTimeScale: false,
+                        });
+                    });
+                }
+
+                function init() {
+                    renderPills();
+                    loadChart();
+                    renderMiniCharts();
+                }
+
+                if (typeof TradingView !== 'undefined') {
+                    init();
+                } else {
+                    var s = document.createElement('script');
+                    s.src = 'https://s3.tradingview.com/tv.js';
+                    s.onload = init;
+                    document.head.appendChild(s);
+                }
             })();
         </script>
 
