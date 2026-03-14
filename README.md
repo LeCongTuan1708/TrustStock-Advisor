@@ -46,3 +46,34 @@ External APIs used:
 ## Database Setup
 
 1. Create a MySQL database:
+CREATE DATABASE INVESTORCARE;
+
+2. Import the schema:
+INVESTORCARE.sql
+
+## Running the Project
+
+1. Clone repository
+2. Import into NetBeans / IntelliJ
+
+3. Configure database connection
+
+4. Run with Tomcat server
+
+---
+
+## Future Improvements
+
+- Financial news sentiment analysis
+- Automated risk alert system
+
+---
+
+## Authors
+
+- Pham Khai Trieu
+- Tran Mai Cong Hung
+- Tran Minh Quy
+- Le Cong Tuan
+##Supervisor
+-Le Vo Minh Thu
